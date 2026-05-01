@@ -47,7 +47,7 @@ When a user wants to bring their week into a therapy session, they can export a 
 
 The portal shows:
 
-- **8-day mood timeline** with crisis language signals flagged (⚠)
+- **7-day mood timeline** with crisis language signals flagged (⚠)
 - **Crisis risk assessment** — green / amber / red based on language patterns, consecutive low-mood days, and relationship health scores
 - **Emotional distribution** chart
 - **Client overview** — entries count, low-mood days, relationship scores
@@ -73,11 +73,11 @@ Both files are standalone HTML — no installation, no server, no dependencies.
 
 Mirumi uses the Anthropic Claude API to generate journal responses and clinical summaries. To use the live AI:
 
-1. Get a free API key at [console.anthropic.com](https://console.anthropic.com)
+1. Get a API key at [console.anthropic.com](https://console.anthropic.com)
 2. Click the **⚙** button in the top-right corner of either portal
 3. Paste your key — it's stored only in your browser, never sent anywhere except directly to Anthropic
 
-### Demo Mode (no API key needed)
+### Demo Mode
 
 Both portals include a built-in **Demo Mode** for presentations or testing without an API key:
 
