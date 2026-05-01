@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirumi</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><g transform='translate(16,16)'><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(72)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(144)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(216)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(288)'/><circle cx='0' cy='0' r='3.5' fill='%23C4788A'/></g></svg>" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Sans:wght@300;400;500&family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* Spring base */
+  --bg:#fdf8f3;
+  --bg2:#faf3eb;
+  --surface:#ffffff;
+  --surface2:#fef9f4;
+  --border:#ecddd0;
+  --border-hi:#d4a882;
+  --text:#3d2e22;
+  --muted:#a8907c;
+  --dim:#7a6055;
+  --accent:#c8845a;
+  --accent-soft:rgba(200,132,90,0.12);
+  --accent-glow:rgba(200,132,90,0.22);
+
+  /* Mood palette - Muted Morandi */
+  --mood-happy:#E8D5A3;
+  --mood-touched:#A8B5A2;
+  --mood-calm:#B0ADB5;
+  --mood-excited:#D4B5B5;
+  --mood-sad:#9BAFC4;
+  --mood-hurt:#8E9BAE;
+  --mood-anxious:#B5A8C8;
+  --mood-angry:#C4A09A;
+  --mood-irritated:#C8B09A;
+
+  --shadow:rgba(100,60,30,0.08);
+  --shadow-md:rgba(100,60,30,0.13);
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC','Noto Sans',sans-serif;overflow-x:hidden}
+
+/* Spring ambient */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,220,160,0.18) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 20%,rgba(255,200,180,0.1) 0%,transparent 50%),
+    radial-gradient(ellipse 30% 25% at 5% 80%,rgba(200,220,180,0.08) 0%,transparent 50%);
+}
+
+/* Floating star decorations */
+.petal{position:fixed;pointer-events:none;z-index:0;opacity:0;animation:drift linear infinite}
+@keyframes drift{0%{opacity:0;transform:translateY(-20px) rotate(0deg)}10%{opacity:0.22}80%{opacity:0.12}100%{opacity:0;transform:translateY(105vh) rotate(360deg) translateX(15px)}}
+
+
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:58px;
+  background:rgba(253,248,243,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);letter-spacing:0.01em}
+.nav-logo span{font-size:16px}
+.nav-pills{display:flex;gap:4px}
+.nav-pill{
+  padding:6px 16px;border-radius:20px;border:1.5px solid transparent;
+  background:none;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;
+}
+.nav-pill:hover{color:var(--dim);border-color:var(--border)}
+.nav-pill.active{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+
+/* ── MOBILE BOTTOM TAB BAR ── */
+.mobile-tabs{display:none}
+@media(max-width:600px){
+  .nav{padding:0 16px;height:52px}
+  .nav-pills{display:none}
+  #demoBtn{display:none}
+  .mobile-tabs{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:100;
+    background:rgba(253,248,243,0.96);backdrop-filter:blur(16px);
+    border-top:1px solid var(--border);height:60px;
+    box-shadow:0 -4px 20px rgba(61,46,34,0.07);
+  }
+  .mobile-tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;background:none;border:none;cursor:pointer;
+    font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;
+    letter-spacing:0.06em;color:var(--muted);transition:color 0.2s;padding:0;
+  }
+  .mobile-tab svg{transition:opacity 0.2s}
+  .mobile-tab.active{color:var(--accent)}
+  .mobile-tab.active svg path,.mobile-tab.active svg circle,.mobile-tab.active svg rect{stroke:var(--accent)}
+  .container{padding:68px 16px 84px}
+  .home-hero{padding:28px 0 24px}
+  .home-title{font-size:clamp(30px,9vw,42px)}
+  .home-sub{font-size:12px;margin-bottom:24px}
+  .home-cards{gap:12px}
+  .home-card{padding:20px 18px}
+}
+
+/* ── PAGES ── */
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+.container{max-width:740px;margin:0 auto;padding:80px 24px 100px}
+
+/* ── HOME PAGE ── */
+.home-hero{text-align:center;padding:48px 0 40px;animation:fadeUp 0.7s ease both}
+.home-greeting{
+  font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;
+}
+.home-title{
+  font-family:'DM Serif Display',serif;font-size:clamp(38px,6vw,56px);
+  color:var(--text);line-height:1.1;margin-bottom:12px;
+}
+.home-title em{font-style:italic;color:var(--accent)}
+.home-sub{font-size:13px;color:var(--muted);line-height:1.7;max-width:400px;margin:0 auto 36px}
+
+/* Big nav cards */
+.home-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+@media(max-width:520px){.home-cards{grid-template-columns:1fr}}
+.home-card{
+  padding:28px 24px;border-radius:16px;border:1.5px solid var(--border);
+  background:var(--surface);cursor:pointer;transition:all 0.25s;
+  text-align:left;position:relative;overflow:hidden;
+}
+.home-card::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s;background:radial-gradient(circle at top left,var(--card-tint,rgba(200,132,90,0.06)),transparent 70%)}
+.home-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 36px var(--shadow-md)}
+.home-card:hover::after{opacity:1}
+.hc-icon{margin-bottom:14px;display:block;line-height:1}
+.hc-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:6px}
+.hc-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.hc-arrow{position:absolute;right:18px;bottom:18px;color:var(--border-hi);font-size:16px;transition:all 0.2s}
+.home-card:hover .hc-arrow{color:var(--accent);transform:translateX(3px)}
+
+/* Recent strip */
+.recent-strip{animation:fadeUp 0.7s 0.15s ease both}
+.strip-title{font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.recent-list{display:flex;flex-direction:column;gap:8px}
+.recent-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;border-radius:12px;border:1.5px solid var(--border);
+  background:var(--surface);cursor:pointer;transition:all 0.2s;
+}
+.recent-item:hover{border-color:var(--accent);box-shadow:0 4px 16px var(--shadow)}
+.ri-mood-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ri-info{flex:1}
+.ri-title{font-size:13px;font-weight:500;color:var(--text)}
+.ri-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.ri-date{font-family:'Quicksand',sans-serif;font-size:10px;color:var(--muted);letter-spacing:0.05em;white-space:nowrap}
+
+/* ── JOURNAL PAGE ── */
+.page-header{margin-bottom:36px;animation:fadeUp 0.6s ease both}
+.ph-badge{
+  display:inline-block;font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);
+  background:var(--accent-soft);border:1.5px solid var(--accent);
+  padding:4px 14px;border-radius:20px;margin-bottom:16px;
+}
+.ph-title{font-family:'DM Serif Display',serif;font-size:36px;color:var(--text);line-height:1.15;margin-bottom:8px}
+.ph-title em{font-style:italic;color:var(--accent)}
+.ph-sub{font-size:13px;color:var(--muted);line-height:1.6}
+
+.field{margin-bottom:20px}
+.fl{display:block;font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.fl span{color:var(--accent);margin-right:5px}
+.ftx,.finp{
+  width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+  padding:13px 17px;font-family:'Noto Sans TC','Noto Sans',sans-serif;
+  font-size:14px;font-weight:300;color:var(--text);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;letter-spacing:0.02em;resize:none;
+}
+.ftx{min-height:110px;line-height:1.85}
+.ftx::placeholder,.finp::placeholder{color:var(--muted);opacity:0.55;font-style:italic}
+.ftx:focus,.finp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.fhint{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.5}
+
+.go-btn{
+  width:100%;padding:15px;
+  background:var(--accent);color:#fff;border:none;border-radius:50px;
+  font-family:'DM Serif Display',serif;font-size:18px;font-style:italic;
+  letter-spacing:0.04em;cursor:pointer;transition:all 0.22s;margin-top:8px;
+  box-shadow:0 4px 20px var(--accent-glow);
+}
+.go-btn:hover{background:#b8733d;transform:translateY(-1px);box-shadow:0 8px 28px var(--accent-glow)}
+.go-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Loading */
+.loading{display:none;text-align:center;padding:70px 0}
+.loading.on{display:block}
+.lflower{animation:bloom 1.5s ease-in-out infinite;display:inline-block}
+@keyframes bloom{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
+.ltxt{font-family:'Quicksand',sans-serif;font-size:13px;color:var(--muted);margin-top:16px;letter-spacing:0.08em}
+
+/* ── RESULTS ── */
+.results{display:none}
+.results.on{display:block;animation:fadeUp 0.5s ease both}
+
+/* Mood banner */
+.mood-banner{
+  border-radius:16px;padding:24px 28px;margin-bottom:20px;
+  border:1.5px solid transparent;position:relative;overflow:hidden;
+  transition:background 0.5s,border-color 0.5s;
+}
+.mood-banner::before{content:'';position:absolute;inset:0;opacity:0.15;background:radial-gradient(ellipse at top right,white,transparent)}
+.mood-banner-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.mood-emoji-big{font-size:38px;line-height:1}
+.mood-name{font-family:'DM Serif Display',serif;font-size:24px;font-style:italic}
+.mood-body{font-size:13px;font-weight:300;line-height:1.85;opacity:0.85;white-space:pre-line}
+
+/* Result cards */
+.rcards{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
+.rcard{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:20px 22px;position:relative;overflow:hidden;
+  animation:fadeUp 0.5s ease both;
+}
+.rcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px}
+.rcard.praise::before{background:var(--mood-happy)}
+.rcard.feedback::before{background:var(--mood-touched)}
+.rcard.growth::before{background:var(--mood-excited)}
+/* Relationship cards */
+.rcard.emotion::before{background:var(--mood-excited)}
+.rcard.other::before{background:var(--mood-touched)}
+.rcard.advice::before{background:var(--mood-happy)}
+.rcard.warning::before{background:var(--mood-angry)}
+.rcard.trend::before{background:var(--mood-anxious)}
+
+.rlabel{
+  font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;
+}
+.rcard-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:8px;line-height:1.3}
+.rbody{font-size:13px;font-weight:300;color:var(--dim);line-height:1.9;white-space:pre-line;letter-spacing:0.02em}
+
+/* Trend bar */
+.trend-meter{margin-top:12px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.trend-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--mood-hurt),var(--mood-happy));transition:width 1.2s ease}
+.trend-score-txt{font-family:'Quicksand',sans-serif;font-size:10px;color:var(--muted);margin-top:6px;font-weight:600}
+
+.save-bar{
+  background:rgba(168,181,162,0.18);border:1.5px solid rgba(168,181,162,0.5);
+  border-radius:10px;padding:12px 18px;font-family:'Quicksand',sans-serif;
+  font-size:12px;color:#7a9a74;text-align:center;margin-bottom:14px;
+  letter-spacing:0.05em;display:none;font-weight:600;
+}
+
+.btn-row{display:flex;gap:10px;margin-top:6px}
+.outline-btn{flex:1;padding:12px;background:none;color:var(--muted);border:1.5px solid var(--border);border-radius:50px;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.outline-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filled-btn{flex:1;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.filled-btn:hover{background:#b8733d}
+.err{font-size:12px;color:#b85050;background:rgba(184,80,80,0.08);border:1.5px solid rgba(184,80,80,0.2);border-radius:8px;padding:11px 16px;margin-top:10px;text-align:center;display:none}
+
+/* ── CATEGORY PILLS (relationship) ── */
+.cat-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;animation:fadeUp 0.6s 0.08s ease both}
+.cat-pill{
+  padding:8px 18px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface);font-family:'Quicksand',sans-serif;font-size:12px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;
+}
+.cat-pill:hover{border-color:var(--accent);color:var(--dim)}
+.cat-pill.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chip{padding:5px 13px;border-radius:16px;border:1.5px solid var(--border);background:var(--surface);font-family:'Quicksand',sans-serif;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.17s;user-select:none}
+.chip:hover{border-color:var(--accent);color:var(--dim)}
+.chip.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* person row */
+.person-row{display:flex;gap:8px}
+.person-row .finp{flex:1}
+.recent-btn-sm{
+  padding:13px 14px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;font-size:11px;color:var(--muted);white-space:nowrap;
+  cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif;font-weight:600;
+}
+.recent-btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+#recentDropdown{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;margin-top:5px;overflow:hidden;box-shadow:0 6px 24px var(--shadow-md)}
+
+/* ── MOOD FLOWER CHART ── */
+.mood-flower-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:32px;padding:24px 20px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:18px;animation:fadeUp 0.5s ease both}
+.mood-flower-title{font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.mood-flower-svg{display:block}
+.mood-flower-legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:16px;max-width:340px}
+.mfl-item{display:flex;align-items:center;gap:5px;font-family:'Quicksand',sans-serif;font-size:10px;font-weight:600;color:var(--dim)}
+.mfl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.mood-flower-empty{font-family:'Quicksand',sans-serif;font-size:12px;color:var(--muted);padding:20px 0;text-align:center}
+
+/* ── ARCHIVE PAGE ── */
+.arch-tabs{display:flex;gap:10px;margin-bottom:28px;border-bottom:1.5px solid var(--border);padding-bottom:0}
+.arch-tab{
+  padding:10px 20px;border:none;background:none;
+  font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;
+  border-bottom:2.5px solid transparent;margin-bottom:-2px;letter-spacing:0.03em;
+}
+.arch-tab:hover{color:var(--dim)}
+.arch-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.arch-list{display:flex;flex-direction:column;gap:10px}
+
+/* Journal archive item */
+.j-item{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:18px 20px;cursor:pointer;transition:all 0.22s;position:relative;
+  animation:fadeUp 0.4s ease both;
+}
+.j-item:hover{border-color:var(--accent);box-shadow:0 4px 20px var(--shadow);transform:translateY(-1px)}
+.j-item-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.j-mood-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:20px;font-family:'Quicksand',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:0.05em;
+}
+.j-date{font-family:'Quicksand',sans-serif;font-size:10px;color:var(--muted);font-weight:600;margin-left:auto;padding-right:4px}
+.j-summary{font-family:'Lora',serif;font-size:17px;font-weight:600;font-style:normal;color:var(--text);margin-bottom:5px;line-height:1.25}
+.j-preview{font-size:11px;color:var(--muted);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item-delete{
+  background:rgba(184,80,80,0.08);border:1px solid rgba(184,80,80,0.2);
+  color:#c05050;font-size:11px;font-weight:600;
+  cursor:pointer;padding:3px 8px;border-radius:6px;
+  font-family:'Quicksand',sans-serif;letter-spacing:0.04em;
+  transition:all 0.2s;flex-shrink:0;
+}
+.item-delete:hover{background:rgba(184,80,80,0.15);border-color:rgba(184,80,80,0.4)}
+
+.p-item{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:18px 20px 36px;cursor:pointer;transition:all 0.22s;position:relative;
+  animation:fadeUp 0.4s ease both;
+}
+.p-item:hover{border-color:var(--accent);box-shadow:0 4px 20px var(--shadow);transform:translateY(-1px)}
+.p-item-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-right:56px}
+.p-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--accent-soft);border:1.5px solid var(--accent);flex-shrink:0}
+.p-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+.p-cat{font-family:'Quicksand',sans-serif;font-size:10px;color:var(--muted);font-weight:600;background:var(--bg2);padding:3px 10px;border-radius:10px;border:1px solid var(--border)}
+.p-last{font-size:11px;color:var(--muted);margin-bottom:5px}
+.p-preview{font-size:11px;color:var(--muted);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.p-count{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-top:6px}
+
+.empty-state{text-align:center;padding:70px 20px}
+.empty-icon{opacity:0.3;margin-bottom:14px;display:block}
+.empty-txt{font-size:13px;color:var(--muted);line-height:1.7;font-family:'Quicksand',sans-serif}
+
+/* ── PERSON DETAIL ── */
+.back-btn{
+  background:none;border:1.5px solid var(--border);color:var(--muted);
+  border-radius:20px;padding:7px 16px;font-family:'Quicksand',sans-serif;
+  font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:24px;display:inline-block;
+}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.detail-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1.5px solid var(--border)}
+.detail-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px}
+.detail-name{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text)}
+.detail-meta{font-size:11px;color:var(--muted);margin-top:3px;font-family:'Quicksand',sans-serif;font-weight:600}
+
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:16px;padding-bottom:24px;position:relative;animation:fadeUp 0.4s ease both}
+.tl-item::before{content:'';position:absolute;left:8px;top:22px;bottom:0;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);flex-shrink:0;margin-top:2px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:8px}
+.tl-body{flex:1}
+.tl-date{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tl-card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.2s;position:relative}
+.tl-card:hover{border-color:var(--accent)}
+.tl-mood{font-family:'Lora',serif;font-size:13px;font-style:italic;color:var(--accent);margin-bottom:5px}
+.tl-preview{font-size:11px;color:var(--muted);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tl-del{position:absolute;top:8px;right:10px;background:rgba(184,80,80,0.08);border:1px solid rgba(184,80,80,0.2);color:#c05050;font-size:10px;font-weight:600;cursor:pointer;padding:2px 7px;border-radius:5px;font-family:'Quicksand',sans-serif;transition:all 0.2s}
+.tl-del:hover{background:rgba(184,80,80,0.15)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(61,46,34,0.4);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.on{display:flex}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px var(--shadow-md)}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0;transition:color 0.2s}
+.modal-close:hover{color:var(--accent)}
+.modal-date{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:block}
+.modal-orig{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.modal-orig-label{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.modal-orig-text{font-size:13px;font-weight:300;color:var(--dim);line-height:1.85;white-space:pre-line}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.rcard:nth-child(1){animation-delay:0.05s}
+.rcard:nth-child(2){animation-delay:0.1s}
+.rcard:nth-child(3){animation-delay:0.15s}
+.rcard:nth-child(4){animation-delay:0.2s}
+.rcard:nth-child(5){animation-delay:0.25s}
+</style>
+</head>
+<body>
+
+<!-- Floating tulips -->
+<div class="petal" style="left:5%;animation-duration:18s;animation-delay:0s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#c8845a" opacity="0.45"/></svg></div>
+<div class="petal" style="left:18%;animation-duration:22s;animation-delay:3s"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#C4A060" opacity="0.35"/></svg></div>
+<div class="petal" style="left:35%;animation-duration:19s;animation-delay:7s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#c8845a" opacity="0.40"/></svg></div>
+<div class="petal" style="left:55%;animation-duration:16s;animation-delay:5s"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#E0CC88" opacity="0.30"/></svg></div>
+<div class="petal" style="left:72%;animation-duration:21s;animation-delay:1s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#C4A060" opacity="0.38"/></svg></div>
+<div class="petal" style="left:88%;animation-duration:24s;animation-delay:9s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2 C12 7 7 12 2 12 C7 12 12 17 12 22 C12 17 17 12 22 12 C17 12 12 7 12 2Z" fill="#c8845a" opacity="0.35"/></svg></div>
+
+
+
+
+<!-- ── NAV ── -->
+<nav class="nav" id="mainNav">
+  <div class="nav-logo">Mirumi <span><svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g transform="translate(16,16)"><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(72)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(144)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(216)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(288)"/><circle cx="0" cy="0" r="3.5" fill="#C4788A"/></g></svg></span></div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <div class="nav-pills">
+      <button class="nav-pill active" onclick="showPage('home')" id="navHome" data-t="nav_home">Home</button>
+      <button class="nav-pill" onclick="showPage('journal')" id="navJournal" data-t="nav_journal">Journal</button>
+      <button class="nav-pill" onclick="showPage('relationship')" id="navRelation" data-t="nav_relation">Relationships</button>
+      <button class="nav-pill" onclick="showPage('archive')" id="navArchive" data-t="nav_archive">Archive</button>
+    </div>
+    <a href="therapist.html" target="_blank" style="padding:0 14px;height:34px;border-radius:20px;border:1.5px solid var(--border);background:none;display:flex;align-items:center;gap:5px;font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.04em;color:var(--muted);text-decoration:none;transition:all 0.2s;flex-shrink:0;white-space:nowrap" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Therapist Portal <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+    <button id="demoBtn" onclick="toggleDemoMode()" title="Demo Mode" style="background:none;border:1.5px solid var(--border);border-radius:20px;padding:0 12px;height:34px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);transition:all 0.2s;flex-shrink:0">
+      <span id="demoDot" style="width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block;transition:background 0.2s"></span>
+      <span id="demoLabel">DEMO OFF</span>
+    </button>
+    <button id="settingsBtn" onclick="openSettings()" title="API Key Settings" style="background:none;border:1.5px solid var(--border);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;transition:all 0.2s;position:relative;flex-shrink:0" onmouseover="this.style.borderColor='var(--border-hi)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙<span id="keyDot" style="display:none;position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:#C45050;border:1.5px solid var(--bg)"></span></button>
+  </div>
+</nav>
+
+<!-- Consent Modal -->
+<div id="consentOverlay" style="display:none;position:fixed;inset:0;background:rgba(61,46,34,0.45);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:22px;padding:36px 30px;width:min(440px,92vw);box-shadow:0 20px 60px rgba(61,46,34,0.18)">
+    <div style="font-size:28px;margin-bottom:12px;text-align:center">🔒</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:21px;color:var(--text);margin-bottom:8px;text-align:center">Before you share</div>
+    <div style="font-size:13px;color:var(--dim);line-height:1.75;margin-bottom:6px">
+      When you submit a journal entry or relationship check-in, that text is sent to <strong style="color:var(--text)">Anthropic's API</strong> so Claude can analyze it. This is how the emotional insights are generated.
+    </div>
+    <div style="font-size:13px;color:var(--dim);line-height:1.75;margin-bottom:20px">
+      <strong style="color:var(--text)">What this means:</strong> Your entries are <em>not</em> stored on any Mirumi server. However, they do travel to Anthropic for processing. Anthropic's API does not use your data to train models. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--accent);text-decoration:none">Read Anthropic's privacy policy →</a>
+    </div>
+    <div style="background:var(--bg2);border-radius:12px;padding:14px 16px;margin-bottom:22px;font-size:12px;color:var(--muted);line-height:1.6">
+      💡 <strong>Tip:</strong> You control what you share. You can write freely and choose not to submit entries you want to keep fully private.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="giveConsent()" style="flex:1;background:var(--accent);color:white;border:none;border-radius:12px;padding:13px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.04em;transition:opacity 0.2s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">I understand — continue</button>
+      <button onclick="declineConsent()" style="padding:13px 18px;background:none;border:1.5px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsOverlay" onclick="if(event.target===this)closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(61,46,34,0.35);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:32px 28px;width:min(420px,90vw);box-shadow:0 8px 32px rgba(61,46,34,0.12)">
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:6px">API Key</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">Your key is stored only in this browser — never sent anywhere except directly to Anthropic. Get yours at <span style="color:var(--accent)">console.anthropic.com</span></div>
+    <input id="keyInput" type="password" placeholder="sk-ant-api03-…" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;margin-bottom:14px" onfocus="this.style.borderColor='var(--border-hi)'" onblur="this.style.borderColor='var(--border)'"/>
+    <div style="display:flex;gap:10px">
+      <button onclick="applyApiKey()" style="flex:1;background:var(--accent);color:white;border:none;border-radius:10px;padding:12px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.04em">Save key</button>
+      <button onclick="closeSettings()" style="padding:12px 18px;background:none;border:1.5px solid var(--border);border-radius:10px;font-family:'Quicksand',sans-serif;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)">Cancel</button>
+    </div>
+    <div id="keyMsg" style="margin-top:12px;font-size:12px;color:var(--green);text-align:center;display:none"></div>
+    <!-- Backup & Restore -->
+    <div style="border-top:1px solid var(--border);margin-top:22px;padding-top:20px">
+      <div style="font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Data Backup</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">Switching browsers? Download a backup of all your journals and relationships, then restore it in the new browser.</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="backupData()" style="flex:1;background:var(--bg2);color:var(--dim);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--border-hi)'" onmouseout="this.style.borderColor='var(--border)'">↓ Backup</button>
+        <button onclick="triggerRestore()" style="flex:1;background:var(--bg2);color:var(--dim);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--border-hi)'" onmouseout="this.style.borderColor='var(--border)'">↑ Restore</button>
+      </div>
+      <div id="backupMsg" style="margin-top:10px;font-size:12px;text-align:center;display:none;font-family:'Quicksand',sans-serif;font-weight:600"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME PAGE ══ -->
+<div class="page" id="page-home">
+<div class="container">
+  <div class="home-hero">
+    <div class="home-greeting" id="homeGreeting">Good morning</div>
+    <h1 class="home-title" data-t="home_title_html">How are you <em>today?</em></h1>
+    <p class="home-sub" data-t="home_sub">Track your mood, understand your relationships — every day deserves to be seen.</p>
+  </div>
+
+  <div class="home-cards">
+    <div class="home-card" style="--card-tint:rgba(232,213,163,0.15)" onclick="showPage('journal')">
+      <span class="hc-icon"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="2" width="21" height="28" rx="5" fill="#a8907c"/><rect x="7" y="7" width="9" height="3.5" rx="1.75" fill="#fdf8f3"/><circle cx="26.5" cy="10" r="2" fill="#c8b09a"/><circle cx="26.5" cy="16" r="2" fill="#c8b09a"/><circle cx="26.5" cy="22" r="2" fill="#c8b09a"/></svg></span>
+      <div class="hc-title" data-t="hc_journal">Daily Journal</div>
+      <div class="hc-desc" data-t="hc_journal_desc">Write about your day. AI reads your mood and cheers you on.</div>
+      <span class="hc-arrow">→</span>
+    </div>
+    <div class="home-card" style="--card-tint:rgba(168,181,162,0.12)" onclick="showPage('relationship')">
+      <span class="hc-icon"><svg width="44" height="32" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="40" height="22" rx="11" fill="#C4A09A"/><path d="M10 23L6 32L20 24Z" fill="#C4A09A"/><circle cx="15" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="22" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="29" cy="13" r="2.5" fill="#fdf8f3"/></svg></span>
+      <div class="hc-title" data-t="hc_relation">Relationship Insight</div>
+      <div class="hc-desc" data-t="hc_relation_desc">Describe a relationship. Get a 5-dimension deep analysis.</div>
+      <span class="hc-arrow">→</span>
+    </div>
+  </div>
+
+  <div class="recent-strip">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><div class="strip-title" data-t="recent_title" style="margin-bottom:0">Recent entries</div><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M12 2L13.4 9.6L22 12L13.4 14.4L12 22L10.6 14.4L2 12L10.6 9.6Z" fill="#c8845a" opacity="0.65"/></svg></div>
+    <div id="homeRecentList"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ JOURNAL PAGE ══ -->
+<div class="page" id="page-journal">
+<div class="container">
+  <div class="page-header">
+    <span class="ph-badge" data-t="j_badge">Daily Journal</span>
+    <h2 class="ph-title" data-t="j_title_html">Well Done! You <em>survived today!</em></h2>
+    <p class="ph-sub" data-t="j_sub">Write about your day and let's look back on it together.</p>
+  </div>
+
+
+  <div id="jForm">
+    <div class="field">
+      <label class="fl" for="jInput"><span>✦</span><span data-t="j_fl1">What happened today?</span></label>
+      <textarea class="ftx" id="jInput" rows="5" data-placeholder-t="j_ph1"></textarea>
+      <div class="fhint" id="jCharHint" data-t="j_hint">Write as much as you like</div>
+    </div>
+    <button class="go-btn" onclick="runJournal()" data-t="j_btn">Let today be seen →</button>
+    <div class="err" id="jErr"></div>
+  </div>
+
+  <div class="loading" id="jLoading">
+    <div class="lflower"><svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g transform="translate(16,16)"><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(72)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(144)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(216)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(288)"/><circle cx="0" cy="0" r="3.5" fill="#C4788A"/></g></svg></div>
+    <div class="ltxt" data-t="j_loading">Reading your day…</div>
+  </div>
+
+  <div class="results" id="jResults">
+    <div class="save-bar" id="jSaveBanner"></div>
+    <div class="mood-banner" id="jMoodBanner">
+      <div class="mood-banner-top">
+        <span class="mood-emoji-big" id="jMoodEmoji">🌸</span>
+        <span class="mood-name" id="jMoodLabel"></span>
+      </div>
+      <div class="mood-body" id="jMoodBody"></div>
+    </div>
+    <div class="rcards" id="jCards"></div>
+    <div class="btn-row">
+      <button class="outline-btn" onclick="resetJournal()" data-t="j_new">← New entry</button>
+      <button class="filled-btn" onclick="showPage('archive')" data-t="j_archive">View archive →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ RELATIONSHIP PAGE ══ -->
+<div class="page" id="page-relationship">
+<div class="container">
+  <div class="page-header">
+    <span class="ph-badge" data-t="r_badge">Relationship Insight</span>
+    <h2 class="ph-title" data-t="r_title_html">The things <em>you'd like to discover</em></h2>
+    <p class="ph-sub" data-t="r_sub">Describe your situation. 5-dimension deep analysis: emotions, their view, advice, red flags, trajectory.</p>
+  </div>
+
+  <div id="rForm">
+    <div class="cat-pills" id="catPills"></div>
+
+    
+    <div class="field">
+      <label class="fl" for="rPersonName"><span>01</span><span data-t="r_fl1">Who is this person?</span></label>
+      <div class="person-row">
+        <input class="finp" id="rPersonName" data-placeholder-t="r_ph1">
+        <button class="recent-btn-sm" onclick="showRecentPeople()" data-t="r_recent">Recent people</button>
+      </div>
+      <div id="recentDropdown" style="display:none"></div>
+
+      <!-- Gender row -->
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;margin-bottom:8px">
+        <span style="font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap" data-t="r_gender_label"></span>
+        <div class="chips" id="rGenderChips" style="margin-top:0;flex-wrap:nowrap"></div>
+      </div>
+
+    </div>
+
+    
+    <div class="field">
+      <label class="fl" for="rPersonDesc"><span>02</span><span data-t="r_fl3">What is this person like?</span></label>
+      <div class="chips" id="rChips"></div>
+      <textarea class="ftx" id="rPersonDesc" rows="2" data-placeholder-t="r_ph3" style="margin-top:12px"></textarea>
+    </div>
+
+    
+    <div class="field">
+      <label class="fl" for="rSituation"><span>03</span><span data-t="r_fl2">What happened?</span></label>
+      <textarea class="ftx" id="rSituation" rows="4" data-placeholder-t="r_ph2"></textarea>
+    </div>
+
+    
+    <div class="field">
+      <label class="fl" for="rGoal"><span>04</span><span data-t="r_fl4">What do you most want to achieve?</span></label>
+      <input class="finp" id="rGoal" data-placeholder-t="r_ph4">
+    </div>
+
+    <button class="go-btn" onclick="runRelation()" data-t="r_btn">Analyze this relationship →</button>
+    <div class="err" id="rErr"></div>
+  </div>
+
+  <div class="loading" id="rLoading">
+    <div class="lflower"><svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 20C16 20 8 17 8 10C8 6.5 10 4.5 13 4.5C14.5 4.5 15.5 5.2 16 6C16.5 5.2 17.5 4.5 19 4.5C22 4.5 24 6.5 24 10C24 17 16 20 16 20Z" fill="#D4A0A8"/><path d="M13.5 7C12.8 8.5 13 11 14 12" stroke="#B8788A" stroke-width="1.2" stroke-linecap="round" fill="none"/><line x1="16" y1="20" x2="16" y2="30" stroke="#A8B5A2" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+    <div class="ltxt" data-t="r_loading">Reading between the lines…</div>
+  </div>
+
+  <div class="results" id="rResults">
+    <div class="save-bar" id="rSaveBanner"></div>
+    <div class="page-header" style="margin-bottom:20px">
+      <span class="res-tag" style="font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent)" data-t="r_done"></span>
+      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-top:8px" id="rSummaryTitle"></div>
+    </div>
+    <div class="rcards" id="rCards"></div>
+    <div class="btn-row">
+      <button class="outline-btn" onclick="resetRelation()" data-t="r_new">← New analysis</button>
+      <button class="filled-btn" onclick="showPage('archive');switchArchiveTab('people')" data-t="r_archive">View archive →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ ARCHIVE PAGE ══ -->
+<div class="page" id="page-archive">
+<div class="container">
+  <div class="page-header">
+    <span class="ph-badge" data-t="arch_badge">Archive</span>
+    <h2 class="ph-title" data-t="arch_title_html">The days that <em>made you</em></h2>
+  </div>
+  <!-- Mood flower chart -->
+  <div id="moodFlowerWrap"></div>
+
+  <div class="arch-tabs">
+    <button class="arch-tab active" id="archTabJournal" onclick="switchArchiveTab('journal')" data-t="arch_tab_j">Journal</button>
+    <button class="arch-tab" id="archTabPeople" onclick="switchArchiveTab('people')" data-t="arch_tab_p">Relationships</button>
+  </div>
+  <div id="archContent"></div>
+
+  <!-- ── Export for Therapist ── -->
+  <div style="margin-top:40px;padding:24px 26px;background:rgba(200,132,90,0.06);border:1.5px solid var(--border);border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);margin-bottom:4px" data-t="arch_export_btn">Generate Therapist Report</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;max-width:380px" data-t="arch_export_desc">Export your journal & relationship data as a JSON file for your counselor</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+      <button onclick="sendToTherapist()" style="padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;box-shadow:0 4px 16px var(--accent-glow)" onmouseover="this.style.background='#b8733d'" onmouseout="this.style.background='var(--accent)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M3 12l18-9-9 18-2-7-7-2z" fill="#fff"/></svg>Send to Therapist Portal
+      </button>
+      <button onclick="exportTherapistJSON()" style="padding:8px 18px;background:none;color:var(--muted);border:1.5px solid var(--border);border-radius:50px;font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.04em" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:5px"><path d="M12 3v13M7 11l5 5 5-5M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download JSON
+      </button>
+    </div>
+  </div>
+  <div id="exportBanner" style="display:none;margin-top:10px;background:rgba(168,181,162,0.18);border:1.5px solid rgba(168,181,162,0.5);border-radius:10px;padding:11px 18px;font-family:'Quicksand',sans-serif;font-size:12px;color:#7a9a74;text-align:center;letter-spacing:0.05em;font-weight:600"></div>
+
+</div>
+</div>
+
+<!-- ══ PERSON DETAIL PAGE ══ -->
+<div class="page" id="page-detail">
+<div class="container">
+  <button class="back-btn" onclick="showPage('archive');switchArchiveTab('people')" data-t="back">← Back</button>
+  <div class="detail-header">
+    <div class="detail-avatar" id="detailAvatar"></div>
+    <div>
+      <div class="detail-name" id="detailName"></div>
+      <div class="detail-meta" id="detailMeta"></div>
+    </div>
+  </div>
+  <div class="timeline" id="timelineEl"></div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <span class="modal-date" id="modalDate"></span>
+    <div class="modal-orig">
+      <div class="modal-orig-label" data-t="modal_orig_label">Your original entry</div>
+      <div class="modal-orig-text" id="modalOrig"></div>
+    </div>
+    <div id="modalCards"></div>
+  </div>
+</div>
+
+<script>
+// ── API Key — add your Anthropic key here ──
+function getApiKey(){return localStorage.getItem('mirumi_api_key')||'';}
+function saveApiKey(k){localStorage.setItem('mirumi_api_key',k.trim());}
+function openSettings(){
+  document.getElementById('keyInput').value=getApiKey();
+  document.getElementById('keyMsg').style.display='none';
+  const o=document.getElementById('settingsOverlay');
+  o.style.display='flex';
+}
+function closeSettings(){document.getElementById('settingsOverlay').style.display='none';}
+function applyApiKey(){
+  const k=document.getElementById('keyInput').value.trim();
+  if(!k){document.getElementById('keyMsg').style.display='block';document.getElementById('keyMsg').style.color='var(--red)';document.getElementById('keyMsg').textContent='Please paste your API key first.';return;}
+  saveApiKey(k);
+  updateKeyDot();
+  document.getElementById('keyMsg').style.display='block';
+  document.getElementById('keyMsg').style.color='var(--green)';
+  document.getElementById('keyMsg').textContent='✓ Key saved. You\'re ready to go.';
+  setTimeout(closeSettings,1200);
+}
+function updateKeyDot(){
+  document.getElementById('keyDot').style.display=getApiKey()?'none':'block';
+}
+
+// ── Demo Mode ──
+function isDemoMode(){return localStorage.getItem('mirumi_demo')==='1';}
+function toggleDemoMode(){
+  const on=!isDemoMode();
+  localStorage.setItem('mirumi_demo',on?'1':'0');
+  if(on){
+    // Always clear existing entries, consent, and re-seed fresh demo data
+    localStorage.removeItem(J_KEY);
+    localStorage.removeItem(R_KEY);
+    localStorage.removeItem('mirumi_consent');
+    seedDemoJournalData();
+  }
+  updateDemoBtn();
+  // Refresh current view
+  const activePage=document.querySelector('.page.active')?.id?.replace('page-','');
+  if(activePage==='archive'){renderMoodFlower();renderArchive('journal');}
+  if(activePage==='home')renderHomeRecent();
+}
+
+function seedDemoJournalData(){
+  // Hardcoded dates — stable regardless of when this runs
+  const D=s=>new Date(s+'T12:00:00').getTime();
+  const journals=[
+    {
+      id:D('2026-04-25'),date:'2026-04-25',text:'Just a quiet Tuesday. Tired from the week already. Nothing special happened — went to class, came back, made tea. Felt kind of numb but not in a bad way. Just low energy. Going to sleep early tonight.',
+      analysis:{mood_key:'calm',mood_label:'Quietly drained',mood_analysis:'Today felt like a breath between things. Low energy, but you kept going — that takes more than it looks.',praise_title:'You showed up anyway',praise_body:'Even on the days when nothing happens and the air feels thick, you still got through it. That is not nothing. That is everything, actually.',feedback:'When you feel this kind of quiet numbness, it can help to name it instead of just moving through it. Even one sentence — "I feel flat today" — gives it somewhere to land.',growth_title:'Let the quiet be enough',growth_tips:'Next time you feel low energy, try not to push yourself to feel more. Rest is not the same as giving up.\n\nTea and early sleep are care. Notice that you already knew what you needed tonight.'},linkedPeople:[]
+    },
+    {
+      id:D('2026-04-26'),date:'2026-04-26',text:'Alex and I had a fight about the weekend plans again. I said I needed some time alone and they took it personally. I can\'t go on pretending everything is fine when I\'m this exhausted. Ended up cancelling everything. Felt dismissed the whole evening.',
+      analysis:{mood_key:'anxious',mood_label:'Stretched thin',mood_analysis:'There\'s a real tension between needing space for yourself and not wanting to hurt someone you care about. You\'re holding both of those things at once — that\'s exhausting.',praise_title:'You said what you needed',praise_body:'Telling someone you need time alone is hard. It always risks being misread. You did it anyway, which means you\'re not completely abandoning your own needs — and that matters.',feedback:'When Alex takes your need for space personally, it might help to separate the request from the relationship: "I need quiet time, and I still care about you" said at the same time can land differently.',growth_title:'Needs are not negotiations',growth_tips:'Practice naming your need and your care in the same sentence. It\'s not a contradiction.\n\nNotice the pattern: fights tend to happen around plans. That might be about something deeper than the weekend itself.'},linkedPeople:['Alex']
+    },
+    {
+      id:D('2026-04-27'),date:'2026-04-27',text:'Called in sick. Just stayed in bed most of the day. Mia texted asking if I wanted to get lunch but I didn\'t have the energy to explain why I couldn\'t. It\'s easier to disappear than to pretend I\'m okay. Watched videos for hours without really watching them.',
+      analysis:{mood_key:'sad',mood_label:'Withdrawing inward',mood_analysis:'Staying in bed is sometimes the only thing that feels manageable. The mind goes quiet in its own way — and that\'s okay for a day.',praise_title:'You let yourself rest',praise_body:'You didn\'t force yourself through a day that was too heavy. Choosing to stay in instead of masking how you feel is a form of honesty with yourself — even if it hurt.',feedback:'Mia reached out, which means people are watching out for you even when you\'re quiet. You don\'t have to explain everything to let someone know you\'re not okay. "Not a great day, maybe next time?" is enough.',growth_title:'Small contact is still contact',growth_tips:'When you don\'t have the energy to explain, you can still reply. One line keeps the bridge open without carrying the whole weight.\n\nNotice when "it\'s easier to disappear" starts to feel like the default. That shift is worth paying attention to.'},linkedPeople:['Mia']
+    },
+    {
+      id:D('2026-04-28'),date:'2026-04-28',text:'Still thinking about what Alex said — "you think too much." Maybe they\'re right. I over-complicate everything. I always make things worse by overthinking. Spent the whole afternoon going over the argument trying to figure out what I did wrong.',
+      analysis:{mood_key:'hurt',mood_label:'Turning inward hard',mood_analysis:'When someone we love says something that stings, it tends to stick louder than all the things that went fine. You\'re not over-complicating this — you\'re trying to make sense of something that hurt.',praise_title:'You\'re still trying to understand',praise_body:'The fact that you spent the afternoon thinking doesn\'t mean you\'re broken — it means you care about getting things right. That\'s a strength, even when it feels like a flaw right now.',feedback:'Rumination and reflection look similar from the inside but feel different. Reflection asks "what can I learn?" — rumination asks "what did I do wrong?" It\'s worth noticing which question you\'re really asking.',growth_title:'Questioning isn\'t the same as failing',growth_tips:'Next time the loop starts, try setting a 10-minute timer. Think as hard as you need to — then close it. You\'re allowed to stop.\n\nAlex\'s words say something about their frustration, not the full truth about who you are.'},linkedPeople:['Alex']
+    },
+    {
+      id:D('2026-04-29'),date:'2026-04-29',text:'Couldn\'t sleep again. Tried talking to Mia about how I\'ve been feeling. She said I was probably just stressed and should try going to the gym. I know she means well but I felt so invisible after. I really am such a burden to the people who care about me. No one really gets it.',
+      analysis:{mood_key:'anxious',mood_label:'Unheard and heavy',mood_analysis:'Reaching out took courage — and getting a practical answer when you needed to be heard is its own kind of loneliness. What you felt after was real.',praise_title:'You tried to reach out',praise_body:'You didn\'t disappear entirely. You texted Mia, you tried. Even when it didn\'t land the way you needed, you were still reaching toward connection — and that matters enormously.',feedback:'The thought "I\'m a burden" tends to arrive when people respond with solutions instead of presence. It\'s about the mismatch, not about your actual worth to the people around you.',growth_title:'Being misunderstood is not proof',growth_tips:'When someone gives you advice instead of presence, you can name it gently: "I don\'t need fixing right now, I just needed to say it out loud." Some people don\'t know how to sit with feelings — that\'s theirs to work on.\n\nYou are not a burden. You are a person who is struggling. Those are not the same thing.'},linkedPeople:['Mia']
+    },
+    {
+      id:D('2026-04-30'),date:'2026-04-30',text:'Alex texted. I didn\'t reply. There\'s no point trying to explain myself anymore. I\'ve stopped caring about whether we fix things or not. I used to try so hard. I don\'t know when I stopped. Maybe I\'ve just accepted that this is how things are.',
+      analysis:{mood_key:'angry',mood_label:'Quietly giving up',mood_analysis:'There\'s a version of anger that goes very still. It doesn\'t shout — it just closes. What you\'re describing sounds like that: exhaustion that\'s settled into distance.',praise_title:'You\'re noticing the shift',praise_body:'The fact that you wrote "I don\'t know when I stopped" means you\'re still paying attention. You haven\'t completely left. Some part of you is still watching, still wondering what happened to the person who tried.',feedback:'Stopping trying can feel like relief, but it can also be a warning sign — in relationships and in yourself. It\'s worth asking whether this is a boundary you\'ve set, or a door you\'re quietly closing.',growth_title:'Silence is still a choice',growth_tips:'Not replying is a decision. That\'s okay — but notice if you\'re making it consciously or if it\'s just what happens now.\n\nThe distance you feel from the relationship might also be telling you something about how far you\'ve drifted from yourself lately.'},linkedPeople:['Alex']
+    }
+  ];
+  const relations={
+    'Partner (Alex)':[
+      {id:D('2026-05-01'),date:new Date('2026-04-28T12:00:00').toISOString(),situation:'We\'ve stopped talking. I didn\'t reply to their text. I don\'t know if I care anymore.',catLabel:'Romantic',chips:[],gender:null,personDesc:'My partner of 2 years',goal:'Understand if this relationship can be repaired',analysis:{summary_title:'Quiet detachment',emotion_read:'There\'s a shift here from hurt and anxiety to something colder — a quiet detachment that can be its own kind of alarm.',other_perspective:'Alex is still reaching out. They may not realize how deep this has gone for you.',specific_advice:'Before deciding anything, check in with yourself: is this distance a decision, or is it what\'s happening while you\'re not looking?',red_flags:'The combination of "stopped caring" and "accepted this is how things are" suggests a process of emotional shutdown — worth taking seriously.',trend_analysis:'The relationship is at a critical low. Without a conversation that acknowledges what\'s happened, this drift may become permanent.',trend_score:18}},
+      {id:D('2026-04-29'),date:new Date('2026-04-28T12:00:00').toISOString(),situation:'Still cold between us. Walking on eggshells. The "you think too much" comment is still in my head.',catLabel:'Romantic',chips:[],gender:null,personDesc:'My partner of 2 years',goal:'Figure out how to address the tension',analysis:{summary_title:'Walking on eggshells',emotion_read:'You\'re carrying hurt from the comment and uncertainty about whether it\'s safe to bring it up.',other_perspective:'Alex may be unaware how much that phrase landed. Or they may know and feel stuck too.',specific_advice:'Name the specific phrase that hurt: "when you said that, this is what it did to me." Specifics land better than general tension.',red_flags:'Extended cold periods without repair tend to deepen into learned distance.',trend_analysis:'The relationship is losing warmth steadily. Both sides seem to be waiting for the other to move first.',trend_score:32}},
+      {id:D('2026-04-27'),date:new Date('2026-04-26T12:00:00').toISOString(),situation:'We had a fight about plans. I said I needed space and they took it personally. Felt dismissed all evening.',catLabel:'Romantic',chips:[],gender:null,personDesc:'My partner of 2 years',goal:'Navigate disagreements without it turning into a fight',analysis:{summary_title:'Fight about space',emotion_read:'You\'re feeling dismissed and not heard. The fight was really about your need for space going unseen.',other_perspective:'Alex may have interpreted your need for space as rejection or pulling away, which triggered defensiveness.',specific_advice:'Try the "24-hour rule" — give it a day before addressing it, so both of you can step out of the reactive moment.',red_flags:'If your need for space consistently triggers a fight, that\'s a pattern worth naming explicitly.',trend_analysis:'The relationship is under tension. One fight is normal; it\'s the frequency that matters.',trend_score:48}}
+    ],
+    'Friend (Mia)':[
+      {id:D('2026-04-30'),date:new Date('2026-04-28T12:00:00').toISOString(),situation:'I tried to open up about how I\'ve been feeling. She said I was probably just stressed and suggested going to the gym.',catLabel:'Friendship',chips:[],gender:null,personDesc:'Close friend from college',goal:'Feel more understood in this friendship',analysis:{summary_title:'Advice when I needed presence',emotion_read:'You wanted to be heard and received advice instead. The mismatch left you feeling invisible.',other_perspective:'Mia likely responded with what she knows how to give — practical solutions. It wasn\'t dismissal, but it may have felt that way.',specific_advice:'Next time, be explicit about what you need: "I don\'t need solutions, I just need someone to listen." Most people can do that when they know that\'s the ask.',red_flags:'No red flags in the friendship itself — but if you keep withdrawing when she doesn\'t respond perfectly, the gap will quietly grow.',trend_analysis:'A solid friendship navigating a rough patch in communication. The foundation is still good.',trend_score:55}}
+    ]
+  };
+  localStorage.setItem(J_KEY,JSON.stringify(journals));
+  localStorage.setItem(R_KEY,JSON.stringify(relations));
+}
+function updateDemoBtn(){
+  const on=isDemoMode();
+  const btn=document.getElementById('demoBtn');
+  const dot=document.getElementById('demoDot');
+  const lbl=document.getElementById('demoLabel');
+  if(!btn)return;
+  btn.style.borderColor=on?'#5A9A6A':'var(--border)';
+  btn.style.color=on?'#5A9A6A':'var(--muted)';
+  dot.style.background=on?'#5A9A6A':'var(--muted)';
+  lbl.textContent=on?'DEMO ON':'DEMO OFF';
+}
+
+const DEMO_JOURNAL={
+  mood_key:'sad',
+  mood_label:'Lost and deeply weary',
+  mood_analysis:"The words you wrote carry real weight — this is more than a hard day. It's the kind of exhaustion that builds quietly until it's hard to remember feeling any other way. Feeling like a burden is one of the loneliest feelings there is, and the fact that you're still here, still writing, still reaching out — that matters more than you know.",
+  praise_title:'You wrote this when it felt impossible',
+  praise_body:"It takes something real to put words to feelings this heavy. You didn't have to look at this today, but you did. That act — of sitting with your pain instead of pushing it further down — is not nothing. Even when everything feels pointless, something in you still reached out. Please don't underestimate that.",
+  feedback:"The feeling of being a burden to the people around you is a feeling, not a fact — but when you're this exhausted, those two things can be very hard to tell apart. You don't have to have it all figured out. But you don't have to hold this alone either. If there is one person in your life who could hear even a fraction of what you wrote today, it might be worth the risk.",
+  growth_title:"You don't have to carry this alone",
+  growth_tips:"If you have access to a counselor, therapist, or even a trusted friend — this entry is worth sharing. Not to be fixed, just to be witnessed by someone who can sit with you in it.\n\nIf the emptiness doesn't lift in the next day or two, please consider reaching out to a mental health support line. Texting HOME to 741741 connects you with a trained counselor — free, confidential, no commitment.\n\nFor tonight: one small thing your body needs. Water, warmth, a window. You don't have to solve anything right now — just get through the next hour."
+};
+
+const DEMO_RELATION={
+  summary_title:'An unspoken distance that grew between you',
+  emotion_read:"You're sitting with a complicated mix of hurt and uncertainty — wanting to reach out but not quite sure how, and not entirely sure if you should. There's a longing to be understood that hasn't found its way into words yet, and that's a hard place to be.",
+  other_perspective:"From their side, they may not fully grasp the weight of what you experienced. People often pull back when they feel unsure of what to say — silence isn't always indifference. They may be carrying their own worry about having said the wrong thing.",
+  specific_advice:"When the moment feels right, try opening with something specific rather than general: 'When that happened, I felt…' is much softer to receive than 'You made me feel…' This shift keeps the door open. Give them a concrete, low-pressure way to re-enter the conversation — something like: 'I'd really like to just talk when you have the space for it.'",
+  red_flags:"Watch for patterns where apologies or reassurances quickly dissolve the issue without any real understanding being reached — resolution that comes too fast often means something got skipped. Also notice if you consistently feel you need to soften your needs to keep the peace.",
+  trend_analysis:"This relationship has real warmth at its core, but there are some communication patterns that could grow if unaddressed. The good news is you're both clearly invested. With a little more directness and mutual willingness to be vulnerable, the arc from here is likely positive.",
+  trend_score:68
+};
+
+// ══ i18n ══
+const T={
+  en:{
+    nav_home:'Home',nav_journal:'Journal',nav_relation:'Relationships',nav_archive:'Archive',
+    home_title_html:'How are you <em>today?</em>',
+    home_sub:'Track your mood, understand your relationships — every day deserves to be seen.',
+    hc_journal:'Daily Journal',hc_journal_desc:'Write about your day. AI reads your mood and cheers you on.',
+    hc_relation:'Relationship Insight',hc_relation_desc:'Describe a relationship. Get a 5-dimension deep analysis.',
+    recent_title:'Recent entries',
+    j_badge:'Daily Journal',j_title_html:'Well Done! You <em>survived today!</em>',
+    j_sub:'Write about your day and let\'s look back on it together.',
+    j_fl1:'What happened today?',j_ph1:'Big things, small things, feelings, people you met, anything on your mind…',
+    j_hint:'Write as much as you like',j_btn:'Let today be seen →',
+    j_loading:'Reading your day…',j_new:'← New entry',j_archive:'View archive →',
+    j_saved:'✓ Saved to journal',j_err:'Write a little more, even a few sentences',
+    r_badge:'Relationship Insight',r_title_html:'The things <em>you\'d like to discover</em>',
+    r_sub:'Describe your situation. 5-dimension deep analysis: emotions, their view, advice, red flags, trajectory.',
+    r_fl1:'Who is this person?',r_ph1:'Enter a name or nickname',
+    r_fl2:'What happened?',r_ph2:'Describe the background, the event, the current state — more detail = better analysis',
+    r_fl3:'What is this person like?',r_ph3:'Personality, communication style, your dynamic',
+    r_fl4:'What do you most want to achieve?',r_ph4:'e.g. Be understood, repair the relationship, set a boundary',
+    r_recent:'Recent people',r_btn:'Analyze this relationship →',
+    r_loading:'Reading between the lines…',
+    r_done:'Analysis Complete',r_new:'← New analysis',r_archive:'View archive →',
+    r_saved:'✓ Saved to archive',r_err_name:'Please enter a name',r_err_sit:'Please describe the situation more',
+    arch_badge:'Archive',arch_title_html:'The days that <em>made you</em>',
+    arch_tab_j:'Journal',arch_tab_p:'Relationships',
+    back:'← Back',modal_orig_label:'Your original entry',
+    entries:'entries',no_j:'No journal entries yet. Write about today',no_p:'No relationship records yet. Analyze one',
+    arch_export_btn:'Generate Therapist Report',arch_export_desc:'Export your journal & relationship data as a JSON file for your counselor',arch_export_done:'✓ Report downloaded',
+    del_entry:'Delete this entry?',del_person:'Delete all entries for this person?',
+    cats:[{id:'love',icon:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,name:'Romantic'},{id:'friendship',icon:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,name:'Friendship'},{id:'work',icon:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,name:'Work'},{id:'family',icon:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`,name:'Family'}],
+    gender:['Male','Female','Not sure'],
+    r_gender_label:'Gender',
+    chips:['Quiet','Blunt','Emotional','Logical','Anxious','Funny','Guarded','Proud','Very gentle','Stubborn','Sensitive','Independent','Dependent','Opinionated','Optimistic','Pessimistic','Face-conscious','Ambitious','Shy','Outgoing','Controlling','Passive','Easily worried','Very rational','Romantic','Realistic','Generous','Self-centred','Empathetic','Lacks empathy'],
+    j_praise:'You deserve to be seen',j_feedback:'A little feedback',j_growth:'Growing into yourself',
+    j_people_detected:'People detected in your entry',j_people_hint:'Selected people\'s full history will be included in the analysis for more accurate advice',
+    r_emotion:'Emotional Reading',r_other:"Their Perspective",r_advice:'Actionable Advice',r_warning:'Red Flags',r_trend:'Relationship Trajectory',
+    trend_health:'Relationship Health',
+    greet_morning:'Good morning <svg width="13" height="13" viewBox="0 0 32 32" fill="none" style="vertical-align:middle;display:inline-block"><circle cx="16" cy="16" r="5.5" fill="#c8845a"/><rect x="14.5" y="1.5" width="3" height="5" rx="1.5" fill="#c8845a"/><rect x="14.5" y="25.5" width="3" height="5" rx="1.5" fill="#c8845a"/><rect x="25.5" y="14.5" width="5" height="3" rx="1.5" fill="#c8845a"/><rect x="1.5" y="14.5" width="5" height="3" rx="1.5" fill="#c8845a"/><rect x="22" y="5.5" width="3" height="5" rx="1.5" fill="#c8845a" transform="rotate(45 22 5.5)"/><rect x="4.5" y="21" width="3" height="5" rx="1.5" fill="#c8845a" transform="rotate(45 4.5 21)"/><rect x="22" y="21" width="3" height="5" rx="1.5" fill="#c8845a" transform="rotate(-45 22 21)"/><rect x="4.5" y="5.5" width="3" height="5" rx="1.5" fill="#c8845a" transform="rotate(-45 4.5 5.5)"/></svg>',greet_afternoon:'Good afternoon <svg width="11" height="14" viewBox="0 0 24 32" fill="none" style="vertical-align:middle;display:inline-block"><line x1="12" y1="32" x2="12" y2="8" stroke="#a8907c" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="8" cy="20" rx="5" ry="3.5" fill="#A8B5A2" transform="rotate(-30 8 20)"/><ellipse cx="16" cy="16" rx="5" ry="3.5" fill="#A8B5A2" transform="rotate(30 16 16)"/><ellipse cx="8" cy="12" rx="5" ry="3.5" fill="#A8B5A2" transform="rotate(-20 8 12)"/><ellipse cx="16" cy="8" rx="5" ry="3.5" fill="#A8B5A2" transform="rotate(20 16 8)"/></svg>',greet_evening:'Good evening <svg width="14" height="14" viewBox="0 0 32 32" fill="none" style="vertical-align:middle;display:inline-block"><path d="M20 5C11 4 4 9 4 16C4 23 11 28 20 27C16 25 14 21 14 16C14 11 16 7 20 5Z" fill="#F5D870"/><path d="M20 5C11 4 4 9 4 16C4 23 11 28 20 27C16 25 14 21 14 16C14 11 16 7 20 5Z" fill="none" stroke="#C8A020" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+  }
+};
+
+const MOOD_COLORS={
+  happy:'#E8D5A3',touched:'#A8B5A2',calm:'#B0ADB5',excited:'#D4B5B5',
+  sad:'#9BAFC4',hurt:'#8E9BAE',anxious:'#B5A8C8',angry:'#C4A09A',irritated:'#C8B09A'
+};
+const MOOD_NAMES_EN={happy:'Happy',touched:'Touched',calm:'Calm',excited:'Excited',sad:'Sad',hurt:'Hurt',anxious:'Anxious',angry:'Angry',irritated:'Irritated'};
+const MOOD_EMOJIS={happy:'😊',touched:'🥰',calm:'😌',excited:'🌸',sad:'😔',hurt:'😢',anxious:'😟',angry:'😠',irritated:'😤'};
+
+const J_KEY='mirumi_journal';
+const R_KEY='mirumi_relations';
+let currentCat=null;
+
+// ── Storage ──
+function getJournals(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(J_KEY))||[];
+    // Deduplicate by calendar date — keep most recent entry per date
+    const byDate={};
+    for(const e of raw){
+      const key=e.date&&String(e.date).length===10?String(e.date):
+        (()=>{const d=new Date(String(e.date).length===10?e.date+'T12:00:00':e.date);
+          return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;})();
+      if(!byDate[key]||new Date(e.date)>new Date(byDate[key].date))byDate[key]=e;
+    }
+    return Object.values(byDate).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  }catch{return[]}
+}
+function parseDate(s){return s&&String(s).length===10?new Date(String(s)+'T12:00:00'):new Date(s)}
+function saveJournal(e){const a=getJournals();a.unshift(e);localStorage.setItem(J_KEY,JSON.stringify(a))}
+function deleteJournal(id){const a=getJournals().filter(e=>String(e.id)!==String(id));localStorage.setItem(J_KEY,JSON.stringify(a))}
+function getRelations(){try{return JSON.parse(localStorage.getItem(R_KEY))||{};}catch{return{}}}
+function saveRelation(name,e){const s=getRelations();if(!s[name])s[name]=[];s[name].unshift(e);localStorage.setItem(R_KEY,JSON.stringify(s))}
+function deleteRelEntry(name,id){const s=getRelations();if(s[name])s[name]=s[name].filter(e=>String(e.id)!==String(id));if(s[name]&&!s[name].length)delete s[name];localStorage.setItem(R_KEY,JSON.stringify(s))}
+function deleteRelPerson(name){const s=getRelations();delete s[name];localStorage.setItem(R_KEY,JSON.stringify(s))}
+
+// ── Lang (English-only) ──
+function t(k){return T.en[k]||k}
+function applyLang(){
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.getAttribute('data-t');const v=t(k);if(k.endsWith('_html'))el.innerHTML=v;else el.textContent=v;});
+  document.querySelectorAll('[data-placeholder-t]').forEach(el=>{el.placeholder=t(el.getAttribute('data-placeholder-t'));});
+}
+function setGreeting(){
+  const h=new Date().getHours();
+  const key=h<12?'greet_morning':h<18?'greet_afternoon':'greet_evening';
+  document.getElementById('homeGreeting').innerHTML=t(key);
+}
+function buildCats(){
+  document.getElementById('catPills').innerHTML=T.en.cats.map(c=>`<div class="cat-pill${currentCat===c.id?' sel':''}" data-cat="${c.id}" onclick="selCat(this)">${c.icon} ${c.name}</div>`).join('');
+}
+function buildChips(){
+  // Personality chips
+  document.getElementById('rChips').innerHTML=T.en.chips.map(c=>`<div class="chip" onclick="toggleChip(this)">${c}</div>`).join('');
+  // Gender chips (single select)
+  document.getElementById('rGenderChips').innerHTML=T.en.gender.map(g=>`<div class="chip" onclick="selectGender(this)" data-gender="${g}">${g}</div>`).join('');
+}
+function selCat(el){document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');currentCat=el.dataset.cat;}
+function toggleChip(el){el.classList.toggle('sel');}
+function selectGender(el){
+  document.querySelectorAll('#rGenderChips .chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ── Recent people dropdown ──
+function showRecentPeople(){
+  const dd=document.getElementById('recentDropdown');
+  if(dd.style.display!=='none'){dd.style.display='none';return}
+  const ppl=Object.keys(getRelations());
+  if(!ppl.length){dd.style.display='none';return}
+  dd.innerHTML=ppl.map(p=>`<div style="padding:10px 16px;font-size:13px;color:var(--dim);cursor:pointer;transition:background 0.15s;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''" onclick="pickPerson('${p.replace(/'/g,"\\'")}')">${p}</div>`).join('');
+  dd.style.display='block';
+}
+function pickPerson(n){
+  document.getElementById('rPersonName').value=n;
+  document.getElementById('recentDropdown').style.display='none';
+
+  // Auto-fill from latest saved entry for this person
+  const store=getRelations();
+  const entries=store[n]||[];
+  if(!entries.length)return;
+  const latest=entries[0]; // most recent
+
+  // Fill personDesc
+  document.getElementById('rPersonDesc').value=latest.personDesc||'';
+
+  // Fill category pill
+  if(latest.catLabel){
+    document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('sel'));
+    const match=[...document.querySelectorAll('.cat-pill')].find(p=>p.textContent.includes(latest.catLabel));
+    if(match){match.classList.add('sel');currentCat=match.dataset.cat;}
+  }
+
+  // Fill personality chips — match saved chips text against current chip elements
+  if(latest.chips&&latest.chips.length){
+    document.querySelectorAll('#rChips .chip').forEach(chip=>{
+      chip.classList.toggle('sel', latest.chips.includes(chip.textContent.trim()));
+    });
+  }
+
+  // Fill gender chips
+  if(latest.gender){
+    document.querySelectorAll('#rGenderChips .chip').forEach(chip=>{
+      chip.classList.toggle('sel', chip.dataset.gender===latest.gender);
+    });
+  }
+
+
+  // Show a subtle hint that info was auto-filled
+  const nameInput=document.getElementById('rPersonName');
+  nameInput.style.borderColor='var(--accent)';
+  setTimeout(()=>nameInput.style.borderColor='',1200);
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#recentDropdown')&&!e.target.closest('.recent-btn-sm'))document.getElementById('recentDropdown').style.display='none';});
+
+// ── Pages ──
+function _scrollTop(){
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+}
+function showPage(name){
+  _scrollTop();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mobile-tab').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navMap={home:'navHome',journal:'navJournal',relationship:'navRelation',archive:'navArchive'};
+  const mobileMap={home:'mtHome',journal:'mtJournal',relationship:'mtRelation',archive:'mtArchive'};
+  if(navMap[name])document.getElementById(navMap[name]).classList.add('active');
+  if(mobileMap[name])document.getElementById(mobileMap[name]).classList.add('active');
+  if(name==='home')renderHomeRecent();
+  if(name==='archive'){renderMoodFlower();renderArchive('journal');}
+  // Force scroll after paint — catches any layout shift from rendered content
+  requestAnimationFrame(()=>{ _scrollTop(); requestAnimationFrame(_scrollTop); });
+}
+
+// ── Journal ──
+document.getElementById('jInput').addEventListener('input',function(){
+  const n=this.value.length;
+  document.getElementById('jCharHint').textContent=n>0?`${n} characters`:t('j_hint');
+});
+
+// Auto-detect people from relation store mentioned in journal text — fully automatic, no UI
+function detectPeopleInJournal(text){
+  const store=getRelations();
+  const names=Object.keys(store);
+  // Returns array of names detected — used in runJournal
+  return names.filter(name=>text.includes(name));
+}
+
+function getSelectedPeople(){
+  // Always auto — return all detected people from current journal text
+  const text=document.getElementById('jInput').value;
+  return detectPeopleInJournal(text);
+}
+
+// Build rich relationship context string for a list of people
+function buildRelationContext(peopleNames){
+  const store=getRelations();
+  if(!peopleNames.length)return'';
+  const sections=peopleNames.map(name=>{
+    const entries=store[name]||[];
+    if(!entries.length)return null;
+    const latestDesc=entries[0]?.personDesc||entries[0]?.chips?.join('、')||'';
+    const catLabel=entries[0]?.catLabel||'';
+    const history=entries.map((e,i)=>{
+      const d=parseDate(e.date);
+      const ds=d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      const score=e.analysis?.trend_score!==undefined?`（${'health score'}: ${e.analysis.trend_score}/100）`:'';
+      const summary=e.analysis?.summary_title||'';
+      const sit=e.situation?.slice(0,120)||'';
+      const advice=e.analysis?.specific_advice?.slice(0,100)||'';
+      return `[Entry ${i+1} — ${ds}${score}]: "${summary}" | Situation: ${sit} | Key advice at that time: ${advice}`;
+    }).join('\n');
+    return `--- Person: ${name} (${catLabel}) ---\nPersonality: ${latestDesc||'not described'}\nRelationship history (oldest to newest context, newest = most recent state):\n${history}`;
+  }).filter(Boolean);
+  return sections.length?sections.join('\n\n'):'';
+}
+
+// ── Consent ──
+function hasConsent(){return localStorage.getItem('mirumi_consent')==='true';}
+let _pendingAction=null;
+function requireConsent(fn){
+  if(hasConsent()){fn();return;}
+  _pendingAction=fn;
+  const o=document.getElementById('consentOverlay');
+  o.style.display='flex';
+}
+function giveConsent(){
+  localStorage.setItem('mirumi_consent','true');
+  document.getElementById('consentOverlay').style.display='none';
+  if(_pendingAction){_pendingAction();_pendingAction=null;}
+}
+function declineConsent(){
+  document.getElementById('consentOverlay').style.display='none';
+  _pendingAction=null;
+}
+
+async function runJournal(){
+  requireConsent(_runJournal);
+}
+async function _runJournal(){
+  const text=document.getElementById('jInput').value.trim();
+  if(!text||text.length<10){const e=document.getElementById('jErr');e.textContent=t('j_err');e.style.display='block';return}
+  document.getElementById('jErr').style.display='none';
+  document.getElementById('jForm').style.display='none';
+  document.getElementById('jLoading').classList.add('on');
+  
+  // Build relationship context from selected people
+  const selectedPeople=getSelectedPeople();
+  const relContext=buildRelationContext(selectedPeople);
+  const hasContext=relContext.length>0;
+
+  const contextBlock=hasContext?(`\n\nRELATIONSHIP CONTEXT — The user has an ongoing relationship history with the following people mentioned in this entry. Use this history to give more accurate, personalised advice that considers the full arc of each relationship:\n${relContext}`)
+  :'';
+
+  const prompt=`You are a warm, insightful emotional companion. The user wrote about their day.
+IMPORTANT: Reply entirely in English. Reply ONLY with valid JSON (no markdown, no extra text):
+{
+  "mood_key": one of: happy/touched/calm/excited/sad/hurt/anxious/angry/irritated,
+  "mood_label": "2-4 word mood description in English",
+  "mood_analysis": "Warm, insightful analysis of their emotional state, 2-3 sentences in English",
+  "praise_title": "Short praise title in English (max 8 words)",
+  "praise_body": "Genuine praise, 3-4 sentences in English, make them feel seen",
+  "feedback": "Gentle, constructive feedback, 2-3 sentences in English, encouraging tone${hasContext?'. If relevant people from relationship history are mentioned, weave in specific insights about those relationships':''}",
+  "growth_title": "Growth tip title in English (max 6 words)",
+  "growth_tips": "2-3 specific actionable growth suggestions in English, each in a paragraph separated by newline${hasContext?'. Consider the relationship patterns and history provided to give more targeted advice':''}"
+}
+User's day: ${text}${contextBlock}`;
+  try{
+    let d;
+    if(isDemoMode()){
+      await new Promise(r=>setTimeout(r,1400));
+      d=DEMO_JOURNAL;
+    } else {
+      if(!getApiKey()){throw new Error('NO_KEY');}
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:prompt}]})});
+      const data=await res.json();
+      if(!res.ok){
+        const msg=data?.error?.message||`API error ${res.status}`;
+        console.error('API error:',res.status,data);
+        throw new Error(msg);
+      }
+      const raw=data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+      d=JSON.parse(raw);
+    }
+    document.getElementById('jLoading').classList.remove('on');
+    renderJournalResults(d,text);
+    saveJournal({id:Date.now(),date:new Date().toISOString(),text,analysis:d,linkedPeople:selectedPeople});
+    const b=document.getElementById('jSaveBanner');b.textContent=t('j_saved');b.style.display='block';setTimeout(()=>b.style.display='none',3000);
+  }catch(e){
+    document.getElementById('jLoading').classList.remove('on');
+    document.getElementById('jForm').style.display='block';
+    const er=document.getElementById('jErr');
+    if(e.message==='NO_KEY'){er.textContent='No API key — tap ⚙ in the top right to add yours.';}
+    else if(e.message.includes('401')||e.message.toLowerCase().includes('auth')){er.textContent='Invalid API key. Tap ⚙ to re-enter your key.';}
+    else{er.textContent='Error: '+e.message;}
+    er.style.display='block';
+    console.error('runJournal error:',e);
+  }
+}
+
+function renderJournalResults(d,text){
+  const mk=d.mood_key||'calm';
+  const color=MOOD_COLORS[mk]||'#B0ADB5';
+  const banner=document.getElementById('jMoodBanner');
+  banner.style.background=`linear-gradient(135deg,${color}30,${color}18)`;
+  banner.style.borderColor=`${color}80`;
+  document.getElementById('jMoodEmoji').textContent=MOOD_EMOJIS[mk]||'🌸';
+  document.getElementById('jMoodLabel').textContent=d.mood_label||'';
+  document.getElementById('jMoodBody').textContent=d.mood_analysis||'';
+  document.getElementById('jCards').innerHTML=[
+    {type:'praise',label:t('j_praise'),title:d.praise_title,body:d.praise_body},
+    {type:'feedback',label:t('j_feedback'),body:d.feedback},
+    {type:'growth',label:t('j_growth'),title:d.growth_title,body:d.growth_tips},
+  ].map(c=>`<div class="rcard ${c.type}"><div class="rlabel">${c.label}</div>${c.title?`<div class="rcard-title">${c.title}</div>`:''}<div class="rbody">${c.body||''}</div></div>`).join('');
+  document.getElementById('jResults').classList.add('on');
+}
+
+function resetJournal(){
+  document.getElementById('jResults').classList.remove('on');
+  document.getElementById('jForm').style.display='block';
+  document.getElementById('jInput').value='';
+  document.getElementById('jCharHint').textContent=t('j_hint');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+// ── Relationship ──
+async function runRelation(){
+  requireConsent(_runRelation);
+}
+async function _runRelation(){
+  const name=document.getElementById('rPersonName').value.trim();
+  const sit=document.getElementById('rSituation').value.trim();
+  const desc=document.getElementById('rPersonDesc').value.trim();
+  const goal=document.getElementById('rGoal').value.trim();
+  const errEl=document.getElementById('rErr');
+  if(!name){errEl.textContent=t('r_err_name');errEl.style.display='block';return}
+  if(!sit||sit.length<10){errEl.textContent=t('r_err_sit');errEl.style.display='block';return}
+  errEl.style.display='none';
+  const catLabel=currentCat?T.en.cats.find(c=>c.id===currentCat)?.name:'';
+  const chips=[...document.querySelectorAll('#rChips .chip.sel')].map(c=>c.textContent);
+  const gender=document.querySelector('#rGenderChips .chip.sel')?.dataset.gender||'';
+  document.getElementById('rForm').style.display='none';
+  document.getElementById('rLoading').classList.add('on');
+  
+  // Build stacked history for this person from all past entries
+  const store=getRelations();
+  const pastEntries=(store[name]||[]).slice().reverse(); // oldest first for chronological context
+  const hasHistory=pastEntries.length>0;
+  const historyBlock=hasHistory?pastEntries.map((e,i)=>{
+    const d=parseDate(e.date);
+    const ds=d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const score=e.analysis?.trend_score!==undefined?`(${'health'}: ${e.analysis.trend_score}/100)`:'';
+    const summary=e.analysis?.summary_title||'';
+    const sit=(e.situation||'').slice(0,150);
+    const emotionRead=(e.analysis?.emotion_read||'').slice(0,100);
+    const advice=(e.analysis?.specific_advice||'').slice(0,100);
+    return `[${i+1}] ${ds} ${score}\n  Summary: ${summary}\n  What happened: ${sit}\n  Emotional state then: ${emotionRead}\n  Advice given then: ${advice}`;
+  }).join('\n\n'):'';
+
+  const historySection=hasHistory?(`\n\nCOMPLETE RELATIONSHIP HISTORY (chronological, oldest→newest — use this to track how the relationship has evolved and compute an accurate cumulative trend score):\n${historyBlock}\n\nNow analyze this NEW situation in the context of the above history. The trend_score must reflect the CUMULATIVE arc, not just this single incident.`)
+  :'';
+
+  const prompt=`You are an expert relationship psychologist. Analyze this interpersonal situation deeply.
+IMPORTANT: Reply entirely in English. Reply ONLY with valid JSON (no markdown, no extra text):
+{
+  "summary_title": "Core situation in English, 10 words max",
+  "emotion_read": "Deep emotional analysis of the user in English, 2-3 sentences, warm and insightful",
+  "other_perspective": "From the other person's viewpoint in English — feelings, thoughts, motivations, 2-3 sentences",
+  "specific_advice": "Most important actionable advice in English with example phrases to say, 3-4 sentences${hasHistory?'. Reference the relationship history where relevant':''}",
+  "red_flags": "1-2 concrete warnings in English: behaviors or patterns to avoid${hasHistory?'. Consider patterns across the history':''}",
+  "trend_analysis": "Where this relationship is likely heading in English, possible outcomes, 2-3 sentences${hasHistory?'. Must reflect the full cumulative history, not just this incident':''}",
+  "trend_score": number 0-100 for relationship health${hasHistory?', weighted across all historical entries — show progression':' based on current situation'}
+}
+Category: ${catLabel||'Interpersonal'} | Person: ${name}${gender?` | Gender: ${gender}`:''}
+Current situation: ${sit} | Their personality: ${desc||'Not described'}
+${chips.length?'Personality traits: '+chips.join(', '):''}Goal: ${goal||'Not specified'}${historySection}`;
+  try{
+    let d;
+    if(isDemoMode()){
+      await new Promise(r=>setTimeout(r,1400));
+      d=DEMO_RELATION;
+    } else {
+      if(!getApiKey()){throw new Error('NO_KEY');}
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:prompt}]})});
+      const data=await res.json();
+      if(!res.ok){
+        const msg=data?.error?.message||`API error ${res.status}`;
+        console.error('API error:',res.status,data);
+        throw new Error(msg);
+      }
+      const raw=data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+      d=JSON.parse(raw);
+    }
+    document.getElementById('rLoading').classList.remove('on');
+    renderRelationResults(d);
+    saveRelation(name,{id:Date.now(),date:new Date().toISOString(),situation:sit,personDesc:desc,goal,catLabel,chips,gender,analysis:d});
+    const b=document.getElementById('rSaveBanner');b.textContent=t('r_saved');b.style.display='block';setTimeout(()=>b.style.display='none',3000);
+  }catch(e){
+    document.getElementById('rLoading').classList.remove('on');
+    document.getElementById('rForm').style.display='block';
+    const er=document.getElementById('rErr');
+    if(e.message==='NO_KEY'){er.textContent='No API key — tap ⚙ in the top right to add yours.';}
+    else if(e.message.includes('401')||e.message.toLowerCase().includes('auth')){er.textContent='Invalid API key. Tap ⚙ to re-enter your key.';}
+    else{er.textContent='Error: '+e.message;}
+    er.style.display='block';
+    console.error('runRelation error:',e);
+  }
+}
+
+function renderRelationResults(d){
+  document.getElementById('rSummaryTitle').textContent=d.summary_title||'';
+  document.getElementById('rCards').innerHTML=[
+    {type:'emotion',label:t('r_emotion'),body:d.emotion_read},
+    {type:'other',label:t('r_other'),body:d.other_perspective},
+    {type:'advice',label:t('r_advice'),body:d.specific_advice},
+    {type:'warning',label:t('r_warning'),body:d.red_flags},
+    {type:'trend',label:t('r_trend'),body:d.trend_analysis,score:d.trend_score},
+  ].map(c=>`<div class="rcard ${c.type}"><div class="rlabel">${c.label}</div><div class="rbody">${c.body||''}</div>${c.score!==undefined?`<div class="trend-meter"><div class="trend-bar" id="tBar" style="width:0%"></div></div><div class="trend-score-txt">${t('trend_health')} ${c.score}/100</div>`:''}</div>`).join('');
+  setTimeout(()=>{const b=document.getElementById('tBar');if(b)b.style.width=(d.trend_score||50)+'%'},120);
+  document.getElementById('rResults').classList.add('on');
+}
+
+function resetRelation(){
+  document.getElementById('rResults').classList.remove('on');
+  document.getElementById('rForm').style.display='block';
+  document.getElementById('rPersonName').value='';
+  document.getElementById('rSituation').value='';
+  document.getElementById('rPersonDesc').value='';
+  document.getElementById('rGoal').value='';
+  document.getElementById('rErr').style.display='none';
+  document.querySelectorAll('#rChips .chip').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('#rGenderChips .chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('rMBTI').value='';
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('sel'));
+  currentCat=null;
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+// ── Archive ──
+let archiveTab='journal';
+function switchArchiveTab(tab){
+  archiveTab=tab;
+  document.getElementById('archTabJournal').classList.toggle('active',tab==='journal');
+  document.getElementById('archTabPeople').classList.toggle('active',tab==='people');
+  renderArchive(tab);
+}
+function renderArchive(tab){
+  const el=document.getElementById('archContent');
+  if(tab==='journal'){
+    const entries=getJournals();
+    if(!entries.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="44" height="44" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="2" width="21" height="28" rx="5" fill="#a8907c"/><rect x="7" y="7" width="9" height="3.5" rx="1.75" fill="#fdf8f3"/><circle cx="26.5" cy="10" r="2" fill="#c8b09a"/><circle cx="26.5" cy="16" r="2" fill="#c8b09a"/><circle cx="26.5" cy="22" r="2" fill="#c8b09a"/></svg><div class="empty-txt">${t('no_j')}</div></div>`;return}
+    el.innerHTML='<div class="arch-list">'+entries.map((e,i)=>{
+      const d=parseDate(e.date);
+      const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const mk=e.analysis?.mood_key||'calm';
+      const color=MOOD_COLORS[mk]||'#B0ADB5';
+      const moodName=MOOD_NAMES_EN[mk];
+      const emoji=MOOD_EMOJIS[mk]||'✦';
+      return `<div class="j-item" data-journal-id="${e.id}" style="animation-delay:${i*0.05}s">
+        <div class="j-item-top">
+          <div class="j-mood-pill" style="background:${color}30;border:1px solid ${color}70;color:${adjustColor(color)}">
+            <span>${emoji}</span><span>${moodName||''}</span>
+          </div>
+          <span class="j-date">${ds}</span>
+        </div>
+        <div class="j-summary">${e.analysis?.praise_title||''}</div>
+        <div class="j-preview">${e.text?.slice(0,80)||''}</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="item-delete" data-del-journal="${e.id}">delete</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+    // Attach events after render
+    el.querySelectorAll('.j-item').forEach(item=>{
+      item.addEventListener('click',function(ev){
+        if(ev.target.closest('.item-delete'))return;
+        openJournalEntry(this.dataset.journalId);
+      });
+    });
+    el.querySelectorAll('[data-del-journal]').forEach(btn=>{
+      btn.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        delJournal(this.dataset.delJournal);
+      });
+    });
+  } else {
+    const store=getRelations();
+    const names=Object.keys(store);
+    if(!names.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg width="52" height="38" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="40" height="22" rx="11" fill="#C4A09A"/><path d="M10 23L6 32L20 24Z" fill="#C4A09A"/><circle cx="15" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="22" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="29" cy="13" r="2.5" fill="#fdf8f3"/></svg><div class="empty-txt">${t('no_p')}</div></div>`;return}
+    const catIcons={love:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,Romantic:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,Friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,Work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`,Family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`};
+    el.innerHTML='<div class="arch-list">'+names.map((name,i)=>{
+      const entries=store[name];
+      const latest=entries[0];
+      const d=parseDate(latest.date);
+      const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const icon=catIcons[latest.catLabel]||`<svg width="22" height="16" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="2" y="2" width="40" height="22" rx="11" fill="#C4A09A"/><path d="M10 23L6 32L20 24Z" fill="#C4A09A"/><circle cx="15" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="22" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="29" cy="13" r="2.5" fill="#fdf8f3"/></svg>`;
+      const safeName=encodeURIComponent(name);
+      return `<div class="p-item" data-person-name="${safeName}" style="animation-delay:${i*0.05}s">
+        <div class="p-item-top">
+          <div class="p-avatar">${icon}</div>
+          <div>
+            <div class="p-name">${name}</div>
+            <div style="display:flex;gap:6px;margin-top:4px"><span class="p-cat">${latest.catLabel||''}</span></div>
+          </div>
+        </div>
+        <div class="p-last">${ds}</div>
+        <div class="p-preview">${latest.analysis?.summary_title||latest.situation?.slice(0,70)||''}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <div class="p-count">${entries.length} ${t('entries')}</div>
+          <button class="item-delete" data-del-person="${safeName}">delete</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+    // Attach events after render
+    el.querySelectorAll('.p-item').forEach(item=>{
+      item.addEventListener('click',function(ev){
+        if(ev.target.closest('.item-delete'))return;
+        openPerson(decodeURIComponent(this.dataset.personName),null);
+      });
+    });
+    el.querySelectorAll('[data-del-person]').forEach(btn=>{
+      btn.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        delPerson(decodeURIComponent(this.dataset.delPerson));
+      });
+    });
+  }
+}
+
+function adjustColor(hex){
+  // darken hex slightly for text
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.max(0,r-60)},${Math.max(0,g-60)},${Math.max(0,b-60)})`;
+}
+
+function openJournalEntry(id){
+  const entry=getJournals().find(e=>String(e.id)===String(id));
+  if(!entry)return;
+  const d=parseDate(entry.date);
+  const ds=d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('modalDate').textContent=ds;
+  document.getElementById('modalOrig').textContent=entry.text||'';
+  const a=entry.analysis;
+  const labels=['You deserve to be seen','A little feedback','Growing into yourself'];
+  const mk=a?.mood_key||'calm';const color=MOOD_COLORS[mk]||'#B0ADB5';
+  const mname=MOOD_NAMES_EN[mk];
+  document.getElementById('modalCards').innerHTML=`
+    <div style="background:${color}25;border:1.5px solid ${color}60;border-radius:12px;padding:18px 20px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:28px">${MOOD_EMOJIS[mk]||'🌸'}</span><span style="font-family:'DM Serif Display',serif;font-size:18px;font-style:italic;color:var(--accent)">${mname}</span></div>
+      <div style="font-size:13px;font-weight:300;color:var(--dim);line-height:1.85">${a?.mood_analysis||''}</div>
+    </div>`+
+    [['praise',labels[0],a?.praise_title,a?.praise_body],['feedback',labels[1],'',a?.feedback],['growth',labels[2],a?.growth_title,a?.growth_tips]].map(([type,label,title,body])=>`
+    <div class="rcard ${type}" style="margin-bottom:10px"><div class="rlabel">${label}</div>${title?`<div class="rcard-title">${title}</div>`:''}<div class="rbody">${body||''}</div></div>`).join('');
+  document.getElementById('modalOverlay').classList.add('on');
+}
+
+function openPerson(name,event){
+  if(event&&(event.target.classList.contains('item-delete')||event.target.closest('.item-delete')))return;
+  const store=getRelations();const entries=store[name]||[];
+  document.getElementById('detailName').textContent=name;
+  const catIcons={love:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,Romantic:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,Friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,Work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`,Family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`};
+  document.getElementById('detailAvatar').innerHTML=catIcons[entries[0]?.catLabel]||`<svg width="22" height="16" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="2" y="2" width="40" height="22" rx="11" fill="#C4A09A"/><path d="M10 23L6 32L20 24Z" fill="#C4A09A"/><circle cx="15" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="22" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="29" cy="13" r="2.5" fill="#fdf8f3"/></svg>`;
+  document.getElementById('detailMeta').textContent=`${entries.length} ${t('entries')}`;
+  document.getElementById('timelineEl').innerHTML=entries.map((e,i)=>{
+    const d=parseDate(e.date);
+    const el='en';
+    const ds=d.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="tl-item" style="animation-delay:${i*0.06}s">
+      <div class="tl-dot">✦</div>
+      <div class="tl-body">
+        <div class="tl-date">${ds}</div>
+        <div class="tl-card" data-entry-name="${encodeURIComponent(name)}" data-entry-id="${e.id}">
+          <button class="tl-del" data-del-name="${encodeURIComponent(name)}" data-del-id="${e.id}">delete</button>
+          <div class="tl-mood">${e.analysis?.summary_title||''}</div>
+          <div class="tl-preview">${e.situation?.slice(0,90)||''}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Attach events after render
+  document.querySelectorAll('.tl-card').forEach(card=>{
+    card.addEventListener('click',function(ev){
+      if(ev.target.closest('.tl-del'))return;
+      openRelEntry(decodeURIComponent(this.dataset.entryName),this.dataset.entryId);
+    });
+  });
+  document.querySelectorAll('.tl-del').forEach(btn=>{
+    btn.addEventListener('click',function(ev){
+      ev.stopPropagation();
+      delRelEntry(decodeURIComponent(this.dataset.delName),this.dataset.delId);
+    });
+  });
+
+  showPage('detail');
+}
+
+function openRelEntry(name,id){
+  const store=getRelations();const entry=(store[name]||[]).find(e=>String(e.id)===String(id));
+  if(!entry)return;
+  const el='en';
+  const d=parseDate(entry.date);
+  const ds=d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('modalDate').textContent=ds;
+  document.getElementById('modalOrig').textContent=entry.situation||'';
+  const a=entry.analysis;
+  const labels=['Emotional Reading',"Their Perspective",'Actionable Advice','Red Flags','Relationship Trajectory'];
+  const types=['emotion','other','advice','warning','trend'];
+  const bodies=[a?.emotion_read,a?.other_perspective,a?.specific_advice,a?.red_flags,a?.trend_analysis];
+  document.getElementById('modalCards').innerHTML=types.map((type,i)=>`
+    <div class="rcard ${type}" style="margin-bottom:10px">
+      <div class="rlabel">${labels[i]}</div>
+      <div class="rbody">${bodies[i]||''}</div>
+      ${type==='trend'&&a?.trend_score!==undefined?`<div class="trend-meter"><div class="trend-bar" style="width:${a.trend_score}%"></div></div><div class="trend-score-txt">Relationship Health ${a.trend_score}/100</div>`:''}
+    </div>`).join('');
+  document.getElementById('modalOverlay').classList.add('on');
+}
+
+function closeModal(e){if(!e||e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('on');}
+
+// ── Delete ──
+function delJournal(id){
+  deleteJournal(id);
+  renderArchive('journal');
+}
+function delPerson(name){
+  deleteRelPerson(name);
+  renderArchive('people');
+}
+function delRelEntry(name,id){
+  deleteRelEntry(name,id);
+  // Refresh detail view; if no entries left go back to archive
+  const remaining=(getRelations()[name]||[]).length;
+  if(remaining===0){showPage('archive');switchArchiveTab('people');}
+  else{openPerson(name,null);}
+}
+
+// ── Therapist Report Export ──
+function buildExportPayload(){
+  const journals=getJournals();
+  const relations=getRelations();
+  const MOOD_NAMES_EN_LOCAL={happy:'Happy',touched:'Touched',calm:'Calm',excited:'Excited',sad:'Sad',hurt:'Hurt',anxious:'Anxious',angry:'Angry',irritated:'Irritated'};
+  const toExportDate=s=>{
+    if(!s)return'';
+    if(String(s).length===10)return String(s);
+    const d=new Date(s);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+  return{
+    exported_at:toExportDate(new Date().toISOString()),
+    user_label:'Anonymous',
+    journal_entries:journals.map(e=>({
+      date:toExportDate(e.date),
+      text:e.text||'',
+      mood_key:e.analysis?.mood_key||'calm',
+      mood_name:e.analysis?.mood_label||(MOOD_NAMES_EN_LOCAL[e.analysis?.mood_key]||'Calm'),
+      mood_analysis:e.analysis?.mood_analysis||'',
+      praise_title:e.analysis?.praise_title||'',
+      reframe:e.analysis?.feedback||'',
+      growth_question:e.analysis?.growth_tips||''
+    })),
+    relationships:Object.fromEntries(
+      Object.entries(relations).map(([name,entries])=>[name,entries.map(e=>({
+        date:toExportDate(e.date),
+        situation:e.situation||'',
+        trend_score:e.analysis?.trend_score??50,
+        red_flags:e.analysis?.red_flags||'',
+        emotion_read:e.analysis?.emotion_read||'',
+        summary_title:e.analysis?.summary_title||''
+      }))])
+    )
+  };
+}
+function exportTherapistJSON(){
+  const payload=buildExportPayload();
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`mirumi-report-${payload.exported_at}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showExportBanner(t('arch_export_done'));
+}
+function sendToTherapist(){
+  const payload=buildExportPayload();
+  const json=JSON.stringify(payload);
+  const encoded=btoa(unescape(encodeURIComponent(json)));
+  const therapistURL='therapist.html#d='+encoded;
+  window.open(therapistURL,'_blank');
+  document.getElementById('sentSuccessOverlay').style.display='flex';
+}
+function showExportBanner(msg){
+  const banner=document.getElementById('exportBanner');
+  banner.textContent=msg;
+  banner.style.display='block';
+  setTimeout(()=>banner.style.display='none',3500);
+}
+
+// ── Home Recent ──
+function renderHomeRecent(){
+  const jEntries=getJournals().slice(0,2);
+  const rStore=getRelations();
+  const rEntries=Object.entries(rStore).slice(0,2).map(([name,entries])=>({name,latest:entries[0]}));
+  const combined=[
+    ...jEntries.map(e=>({type:'journal',date:parseDate(e.date),data:e})),
+    ...rEntries.map(e=>({type:'relation',date:parseDate(e.latest.date),data:e}))
+  ].sort((a,b)=>b.date-a.date).slice(0,4);
+
+  const el=document.getElementById('homeRecentList');
+  if(!combined.length){el.innerHTML=`<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;font-family:'Quicksand',sans-serif">✦</div>`;return}
+  el.innerHTML='<div class="recent-list">'+combined.map(item=>{
+    if(item.type==='journal'){
+      const e=item.data;const mk=e.analysis?.mood_key||'calm';const color=MOOD_COLORS[mk];
+      const ds=item.date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `<div class="recent-item" onclick="showPage('archive');switchArchiveTab('journal')">
+        <div class="ri-mood-dot" style="background:${color}"></div>
+        <div class="ri-info"><div class="ri-title">${e.analysis?.praise_title||'Journal entry'}</div><div class="ri-meta">${MOOD_EMOJIS[mk]} ${MOOD_NAMES_EN[mk]}</div></div>
+        <div class="ri-date">${ds}</div>
+      </div>`;
+    } else {
+      const {name,latest}=item.data;
+      const ds=item.date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const catIcons={love:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,Romantic:`<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M10 17C10 17 1.5 12 1.5 6C1.5 3.2 3.5 1.5 5.8 1.5C7.2 1.5 8.5 2.3 10 3.8C11.5 2.3 12.8 1.5 14.2 1.5C16.5 1.5 18.5 3.2 18.5 6C18.5 12 10 17 10 17Z" fill="#B8788A"/></svg>`,Friendship:`<svg width="24" height="20" viewBox="0 0 30 22" fill="none" style="vertical-align:middle"><circle cx="9" cy="5" r="4" fill="#a8907c"/><path d="M3 21C3 15 6 12 9 12C12 12 15 15 15 21Z" fill="#a8907c"/><circle cx="21" cy="5" r="4" fill="#c0a890"/><path d="M15 21C15 15 18 12 21 12C24 12 27 15 27 21Z" fill="#c0a890"/></svg>`,work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,Work:`<svg width="20" height="18" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="1" y="7" width="20" height="12" rx="3" fill="#a8907c"/><path d="M8 7V5C8 4 8.8 3 11 3C13.2 3 14 4 14 5V7" stroke="#c8b09a" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="1" y1="12" x2="21" y2="12" stroke="#8a7060" stroke-width="1"/></svg>`,family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`,Family:`<svg width="20" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M11 1L21.5 9H0.5L11 1Z" fill="#A8B5A2"/><rect x="2" y="9" width="18" height="10" rx="2" fill="#e8d5c0"/><rect x="8.5" y="13" width="5" height="6" rx="1" fill="#a8907c"/></svg>`};
+      const icon=catIcons[latest.catLabel]||`<svg width="22" height="16" viewBox="0 0 44 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="2" y="2" width="40" height="22" rx="11" fill="#C4A09A"/><path d="M10 23L6 32L20 24Z" fill="#C4A09A"/><circle cx="15" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="22" cy="13" r="2.5" fill="#fdf8f3"/><circle cx="29" cy="13" r="2.5" fill="#fdf8f3"/></svg>`;
+      return `<div class="recent-item" onclick="openPerson('${name.replace(/'/g,"\\'")}',null);showPage('detail')">
+        <div class="ri-mood-dot" style="background:var(--accent)"></div>
+        <div class="ri-info"><div class="ri-title">${icon} ${name}</div><div class="ri-meta">${latest.analysis?.summary_title||''}</div></div>
+        <div class="ri-date">${ds}</div>
+      </div>`;
+    }
+  }).join('')+'</div>';
+}
+
+// ── Mood Flower Chart ──
+function renderMoodFlower(){
+  const wrap=document.getElementById('moodFlowerWrap');
+  if(!wrap)return;
+  const allEntries=getJournals();
+  if(!allEntries.length){
+    wrap.innerHTML=`<div class="mood-flower-wrap"><div class="mood-flower-title">Your Emotional Journey</div><div class="mood-flower-empty">Start journaling to see your mood flow 🌸</div></div>`;
+    return;
+  }
+  // Sort oldest → newest for chronological left-to-right
+  const entries=[...allEntries].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const n=entries.length;
+
+  // Valence scores: higher = more positive
+  const VALENCE={happy:92,touched:80,excited:88,calm:70,tired:38,sad:22,hurt:18,anxious:28,angry:12,irritated:20};
+
+  // Chart geometry
+  const PL=44,PR=18,PT=18,PB=52; // padding left/right/top/bottom
+  const CW=Math.max(n*72,320), CH=130;
+  const SVG_W=PL+CW+PR, SVG_H=PT+CH+PB;
+
+  const pts=entries.map((e,i)=>{
+    const mk=e.analysis?.mood_key||'calm';
+    const v=VALENCE[mk]??50;
+    const x=n===1 ? PL+CW/2 : PL+(i/(n-1))*CW;
+    const y=PT+CH-(v/100)*CH;
+    return {x,y,mk,v,date:e.date,col:MOOD_COLORS[mk]||'#B0ADB5',lbl:MOOD_NAMES_EN[mk]||mk};
+  });
+
+  // Smooth bezier path
+  function curvePath(p){
+    if(p.length===1)return `M${p[0].x.toFixed(1)},${p[0].y.toFixed(1)}`;
+    let d=`M${p[0].x.toFixed(1)},${p[0].y.toFixed(1)}`;
+    for(let i=0;i<p.length-1;i++){
+      const dx=(p[i+1].x-p[i].x)*0.42;
+      d+=` C${(p[i].x+dx).toFixed(1)},${p[i].y.toFixed(1)} ${(p[i+1].x-dx).toFixed(1)},${p[i+1].y.toFixed(1)} ${p[i+1].x.toFixed(1)},${p[i+1].y.toFixed(1)}`;
+    }
+    return d;
+  }
+  const linePath=curvePath(pts);
+  const areaPath=`${linePath} L${pts[n-1].x.toFixed(1)},${(PT+CH).toFixed(1)} L${pts[0].x.toFixed(1)},${(PT+CH).toFixed(1)} Z`;
+
+  // Horizontal guide lines
+  const guides=[{pct:75,lbl:'better'},{pct:50,lbl:''},{pct:25,lbl:'harder'}].map(({pct,lbl})=>{
+    const gy=(PT+CH-(pct/100)*CH).toFixed(1);
+    return `<line x1="${PL}" y1="${gy}" x2="${PL+CW}" y2="${gy}" stroke="var(--border)" stroke-width="0.8" stroke-dasharray="4,5"/>
+      ${lbl?`<text x="${(PL-6).toFixed(1)}" y="${(+gy+3.5).toFixed(1)}" text-anchor="end" font-size="8.5" fill="var(--muted)" font-family="Quicksand,sans-serif">${lbl}</text>`:''}`;
+  }).join('');
+
+  // Dots + labels
+  const dots=pts.map(p=>{
+    const _pd=p.date&&p.date.length===10?new Date(p.date+'T12:00:00'):new Date(p.date);const ds=_pd.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6.5" fill="${p.col}" stroke="#fdf8f3" stroke-width="2.2"/>
+      <text x="${p.x.toFixed(1)}" y="${(PT+CH+16).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Quicksand,sans-serif">${ds}</text>
+      <text x="${p.x.toFixed(1)}" y="${(PT+CH+28).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${p.col}" font-family="Quicksand,sans-serif" font-weight="700">${p.lbl}</text>`;
+  }).join('');
+
+  // Legend counts
+  const counts={};
+  entries.forEach(e=>{const mk=e.analysis?.mood_key;if(mk)counts[mk]=(counts[mk]||0)+1;});
+  const legendItems=Object.entries(counts).map(([mk,c])=>
+    `<div class="mfl-item"><div class="mfl-dot" style="background:${MOOD_COLORS[mk]||'#ccc'}"></div>${MOOD_NAMES_EN[mk]||mk} <span style="color:var(--accent);margin-left:2px;font-weight:700">×${c}</span></div>`
+  ).join('');
+
+  wrap.innerHTML=`<div class="mood-flower-wrap">
+    <div class="mood-flower-title">Your Emotional Journey · ${n} entries</div>
+    <div style="overflow-x:auto;width:100%;padding-bottom:4px">
+      <svg width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}" xmlns="http://www.w3.org/2000/svg" style="display:block;min-width:${SVG_W}px">
+        <defs>
+          <linearGradient id="moodAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C4788A" stop-opacity="0.22"/>
+            <stop offset="100%" stop-color="#C4788A" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        ${guides}
+        <path d="${areaPath}" fill="url(#moodAreaGrad)"/>
+        <path d="${linePath}" fill="none" stroke="#C4788A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${dots}
+      </svg>
+    </div>
+    <div class="mood-flower-legend" style="margin-top:12px">${legendItems||'<span class="mood-flower-empty">No moods analyzed yet</span>'}</div>
+  </div>`;
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded',()=>{
+  applyLang();buildCats();buildChips();setGreeting();showPage('home');updateKeyDot();updateDemoBtn();
+});
+
+// ── BACKUP & RESTORE ────────────────────────────────────────────────────
+function backupData(){
+  const data={
+    version:1,
+    backed_up:new Date().toISOString().slice(0,10),
+    mirumi_journal:localStorage.getItem('mirumi_journal')||'[]',
+    mirumi_relations:localStorage.getItem('mirumi_relations')||'{}'
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`mirumi-backup-${data.backed_up}.json`;a.click();
+  URL.revokeObjectURL(url);
+  showBackupMsg('✓ Backup downloaded','var(--green)');
+}
+function triggerRestore(){document.getElementById('restoreFileInput').click();}
+function restoreData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.mirumi_journal) localStorage.setItem('mirumi_journal',data.mirumi_journal);
+      if(data.mirumi_relations) localStorage.setItem('mirumi_relations',data.mirumi_relations);
+      showBackupMsg('✓ Restored — reloading…','var(--green)');
+      setTimeout(()=>location.reload(),1200);
+    }catch(_){showBackupMsg('✗ Invalid backup file','#C45050');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+function showBackupMsg(msg,color){
+  const el=document.getElementById('backupMsg');
+  el.textContent=msg;el.style.color=color;el.style.display='block';
+  setTimeout(()=>el.style.display='none',3200);
+}
+</script>
+
+<!-- ── MOBILE BOTTOM TAB BAR ── -->
+<nav class="mobile-tabs" id="mobileTabs">
+  <button class="mobile-tab active" id="mtHome" onclick="showPage('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="mobile-tab" id="mtJournal" onclick="showPage('journal')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="13" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h6M8 11h6M8 15h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M17 6h1a2 2 0 012 2v11a2 2 0 01-2 2H8" stroke="currentColor" stroke-width="1.8"/></svg>
+    <span>Journal</span>
+  </button>
+  <button class="mobile-tab" id="mtRelation" onclick="showPage('relationship')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>People</span>
+  </button>
+  <button class="mobile-tab" id="mtArchive" onclick="showPage('archive')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="5" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9" stroke="currentColor" stroke-width="1.8"/><path d="M10 13h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>Archive</span>
+  </button>
+</nav>
+<input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="restoreData(event)">
+<!-- ── Sent-Success Overlay ── -->
+<div id="sentSuccessOverlay" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(61,46,34,0.45);backdrop-filter:blur(8px);z-index:400;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:24px;padding:44px 48px;max-width:380px;width:88%;text-align:center;box-shadow:0 24px 60px rgba(61,46,34,0.18);animation:fadeUp 0.3s ease">
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(168,181,162,0.2);border:2px solid rgba(168,181,162,0.5);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">✓</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-bottom:10px">Sent successfully</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:28px">Your report has been sent to the therapist portal.<br>Your counselor will see it when they open their link.</div>
+    <button onclick="document.getElementById('sentSuccessOverlay').style.display='none'" style="padding:11px 32px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px var(--accent-glow)">Done</button>
+  </div>
+</div>
+</body>
+</html>

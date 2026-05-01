@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirumi — Therapist Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><g transform='translate(16,16)'><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(72)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(144)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(216)'/><ellipse cx='0' cy='-7' rx='4' ry='6.5' fill='%23D4A0A8' transform='rotate(288)'/><circle cx='0' cy='0' r='3.5' fill='%23C4788A'/></g></svg>" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans:wght@300;400;500&family=Quicksand:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#fdf8f3;
+  --bg2:#faf3eb;
+  --surface:#ffffff;
+  --surface2:#fef9f4;
+  --border:#ecddd0;
+  --border-hi:#d4a882;
+  --text:#3d2e22;
+  --muted:#a8907c;
+  --dim:#7a6055;
+  --accent:#c8845a;
+  --accent-soft:rgba(200,132,90,0.12);
+  --accent-glow:rgba(200,132,90,0.22);
+  --shadow:rgba(100,60,30,0.08);
+  --shadow-md:rgba(100,60,30,0.13);
+
+  --mood-happy:#E8D5A3;
+  --mood-touched:#A8B5A2;
+  --mood-calm:#B0ADB5;
+  --mood-excited:#D4B5B5;
+  --mood-sad:#9BAFC4;
+  --mood-hurt:#8E9BAE;
+  --mood-anxious:#B5A8C8;
+  --mood-angry:#C4A09A;
+  --mood-irritated:#C8B09A;
+
+  --crisis-red:#C45050;
+  --crisis-red-soft:rgba(196,80,80,0.10);
+  --crisis-amber:#C48830;
+  --crisis-amber-soft:rgba(196,136,48,0.10);
+  --crisis-green:#5A9A6A;
+  --crisis-green-soft:rgba(90,154,106,0.10);
+}
+
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC','Noto Sans',sans-serif;overflow-x:hidden}
+
+/* Ambient */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(255,220,160,0.14) 0%,transparent 60%)}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;height:58px;
+  background:rgba(253,248,243,0.94);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);letter-spacing:0.01em}
+.nav-divider{width:1px;height:18px;background:var(--border)}
+.nav-title{font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.nav-badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--muted);background:var(--bg2);
+  border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;
+}
+
+/* ── UPLOAD ZONE ── */
+#uploadZone{
+  position:relative;z-index:1;
+  max-width:600px;margin:80px auto;padding:0 24px;
+  text-align:center;
+}
+.upload-logo{font-family:'DM Serif Display',serif;font-size:48px;color:var(--accent);margin-bottom:6px;letter-spacing:-0.01em}
+.upload-sub{font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:40px}
+
+.drop-area{
+  border:2px dashed var(--border-hi);border-radius:20px;
+  background:var(--surface);padding:52px 32px;cursor:pointer;
+  transition:all 0.25s;position:relative;
+}
+.drop-area:hover,.drop-area.dragover{
+  border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:0 8px 32px var(--accent-glow);
+}
+.drop-icon{font-size:40px;margin-bottom:16px;display:block;opacity:0.6}
+.drop-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:8px}
+.drop-hint{font-size:12px;color:var(--muted);line-height:1.7}
+.drop-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+
+.upload-or{font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin:20px 0}
+.demo-btn{
+  padding:13px 32px;background:none;
+  border:1.5px solid var(--border-hi);border-radius:50px;
+  font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;
+  color:var(--dim);cursor:pointer;transition:all 0.22s;letter-spacing:0.04em;
+}
+.demo-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;position:relative;z-index:1}
+.dash-inner{max-width:860px;margin:0 auto;padding:36px 24px 80px}
+
+/* API key bar */
+
+/* Client info strip */
+.client-strip{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;flex-wrap:wrap;gap:12px;
+}
+.client-meta{font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.reset-btn{
+  padding:6px 14px;background:none;border:1.5px solid var(--border);
+  border-radius:20px;font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;text-transform:uppercase;
+}
+.reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── CRISIS PANEL ── */
+.crisis-panel{
+  border-radius:16px;padding:22px 26px;margin-bottom:20px;
+  border:2px solid;display:flex;align-items:flex-start;gap:18px;
+  animation:fadeUp 0.5s ease both;
+}
+.crisis-panel.green{background:var(--crisis-green-soft);border-color:rgba(90,154,106,0.35)}
+.crisis-panel.amber{background:var(--crisis-amber-soft);border-color:rgba(196,136,48,0.35)}
+.crisis-panel.red{background:var(--crisis-red-soft);border-color:rgba(196,80,80,0.35)}
+.crisis-indicator{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  border:2px solid currentColor;
+}
+.green .crisis-indicator{color:var(--crisis-green);background:rgba(90,154,106,0.15)}
+.amber .crisis-indicator{color:var(--crisis-amber);background:rgba(196,136,48,0.15)}
+.red .crisis-indicator{color:var(--crisis-red);background:rgba(196,80,80,0.15)}
+.crisis-body{flex:1}
+.crisis-level{font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px}
+.green .crisis-level{color:var(--crisis-green)}
+.amber .crisis-level{color:var(--crisis-amber)}
+.red .crisis-level{color:var(--crisis-red)}
+.crisis-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:6px}
+.crisis-reasons{font-size:12px;color:var(--dim);line-height:1.7}
+.crisis-reasons span{
+  display:inline-block;font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  padding:2px 10px;border-radius:10px;border:1px solid currentColor;margin:3px 4px 0 0;
+}
+.green .crisis-reasons span{color:var(--crisis-green);border-color:rgba(90,154,106,0.4)}
+.amber .crisis-reasons span{color:var(--crisis-amber);border-color:rgba(196,136,48,0.4)}
+.red .crisis-reasons span{color:var(--crisis-red);border-color:rgba(196,80,80,0.4)}
+
+/* ── GRID ROW ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
+
+/* ── CARD BASE ── */
+.dash-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:22px 24px;
+  animation:fadeUp 0.5s ease both;
+}
+.card-label{
+  font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+}
+
+/* ── MOOD TIMELINE ── */
+.timeline-track{display:flex;gap:10px;align-items:flex-end;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.tl-day{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:52px;flex:1}
+.tl-dot{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;border:2px solid rgba(0,0,0,0.08);
+  transition:transform 0.2s;cursor:default;
+  position:relative;
+}
+.tl-dot:hover{transform:scale(1.15)}
+.tl-dot-date{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.05em;color:var(--muted);text-align:center}
+.tl-dot-name{font-family:'Quicksand',sans-serif;font-size:9px;color:var(--muted);text-align:center;line-height:1.3;max-width:52px}
+.tl-empty{opacity:0.3;background:var(--border)}
+
+/* ── MOOD JOURNEY ── */
+.flower-section{margin-top:20px;border-top:1.5px solid var(--border);padding-top:18px;display:flex;flex-direction:column;align-items:stretch;width:100%}
+.flower-label{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;text-align:center}
+.flower-svg{display:block;width:100%;overflow-x:auto}
+.flower-legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;margin-top:12px}
+.fl-item{display:flex;align-items:center;gap:4px;font-family:'Quicksand',sans-serif;font-size:9px;font-weight:600;color:var(--dim)}
+.fl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Overview stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat-item{text-align:center;padding:12px 8px;background:var(--bg2);border-radius:10px}
+.stat-num{font-family:'DM Serif Display',serif;font-size:26px;color:var(--accent);font-style:italic}
+.stat-lbl{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+
+/* ── AI SUMMARY ── */
+.ai-summary-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:22px 24px;margin-bottom:16px;
+  animation:fadeUp 0.5s 0.1s ease both;
+}
+.ai-summary-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.ai-tag{
+  font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);
+  background:var(--accent-soft);border:1.5px solid var(--accent);
+  padding:3px 12px;border-radius:20px;
+}
+.gen-btn{
+  padding:9px 20px;background:var(--accent);color:#fff;border:none;
+  border-radius:50px;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;
+  box-shadow:0 3px 12px var(--accent-glow);
+}
+.gen-btn:hover{background:#b8733d}
+.gen-btn:disabled{opacity:0.4;cursor:not-allowed}
+.ai-summary-body{
+  font-family:'Quicksand',sans-serif;font-size:13.5px;font-weight:500;color:var(--dim);
+  line-height:1.85;letter-spacing:0.01em;font-style:normal;
+  background:var(--bg2);border-radius:10px;padding:16px 18px;
+  min-height:60px;
+}
+.ai-loading{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Quicksand',sans-serif;font-size:12px;color:var(--muted);
+  padding:14px 0;
+}
+.ai-spinner{
+  width:16px;height:16px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 0.8s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-placeholder{font-family:'Quicksand',sans-serif;font-size:12px;color:var(--muted);font-style:normal;letter-spacing:0.05em}
+
+/* ── RELATIONSHIP HEALTH ── */
+.rel-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:22px 24px;margin-bottom:16px;
+  animation:fadeUp 0.5s 0.15s ease both;
+}
+.rel-person{padding:14px 0;border-bottom:1.5px solid var(--border)}
+.rel-person:last-child{border-bottom:none;padding-bottom:0}
+.rel-person:first-child{padding-top:0}
+.rel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
+.rel-name{font-family:'DM Serif Display',serif;font-size:17px;color:var(--text)}
+.rel-score-badge{
+  font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:12px;
+}
+.rel-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.rel-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--mood-hurt),var(--mood-happy));transition:width 1.2s ease}
+.rel-alert{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:10px;letter-spacing:0.06em;
+  margin-top:4px;
+}
+.rel-alert.red{color:var(--crisis-red);background:var(--crisis-red-soft);border:1px solid rgba(196,80,80,0.25)}
+.rel-alert.amber{color:var(--crisis-amber);background:var(--crisis-amber-soft);border:1px solid rgba(196,136,48,0.25)}
+.rel-meta{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* ── JOURNAL ENTRIES ── */
+.journal-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;padding:22px 24px;margin-bottom:16px;
+  animation:fadeUp 0.5s 0.2s ease both;
+}
+.j-entry{
+  border-bottom:1.5px solid var(--border);
+  padding:14px 0;
+}
+.j-entry:last-child{border-bottom:none;padding-bottom:0}
+.j-entry:first-child{padding-top:0}
+.j-entry-header{
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  user-select:none;
+}
+.j-entry-header:hover .j-entry-date{color:var(--accent)}
+.j-mood-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:12px;
+  font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;flex-shrink:0;
+}
+.j-entry-date{font-family:'Quicksand',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.06em;margin-left:auto;transition:color 0.2s}
+.j-entry-title{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.j-toggle{color:var(--muted);font-size:11px;flex-shrink:0;transition:transform 0.2s;font-family:'Quicksand',sans-serif}
+.j-entry-body{display:none;margin-top:12px;padding:14px 16px;background:var(--bg2);border-radius:10px}
+.j-entry-body.open{display:block;animation:fadeUp 0.3s ease both}
+.j-text-label{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.j-text{font-size:13px;font-weight:300;color:var(--dim);line-height:1.85;white-space:pre-wrap}
+.j-analysis-row{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.j-analysis-item{font-size:12px;color:var(--dim);line-height:1.7}
+.j-analysis-item strong{font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-right:5px}
+.crisis-signal-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:'Quicksand',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;
+  padding:2px 8px;border-radius:8px;margin-left:8px;
+  color:var(--crisis-red);background:var(--crisis-red-soft);border:1px solid rgba(196,80,80,0.25);
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-brand">
+    <span class="nav-logo">Mirumi <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-left:2px"><g transform="translate(16,16)"><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(72)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(144)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(216)"/><ellipse cx="0" cy="-7" rx="4" ry="6.5" fill="#D4A0A8" transform="rotate(288)"/><circle cx="0" cy="0" r="3.5" fill="#C4788A"/></g></svg></span>
+    <div class="nav-divider"></div>
+    <span class="nav-title">Therapist Dashboard</span>
+
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="index.html" style="padding:0 14px;height:32px;border-radius:20px;border:1.5px solid var(--border);background:none;display:flex;align-items:center;gap:5px;font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.04em;color:var(--muted);text-decoration:none;transition:all 0.2s;flex-shrink:0;white-space:nowrap" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Journal</a>
+    <div class="nav-badge">
+      <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="10" rx="2" fill="currentColor" opacity="0.5"/><path d="M7 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+      Confidential · Client Data
+    </div>
+    <button id="demoBtn" onclick="toggleDemoMode()" title="Demo Mode" style="background:none;border:1.5px solid var(--border);border-radius:20px;padding:0 12px;height:32px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Quicksand',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);transition:all 0.2s;flex-shrink:0">
+      <span id="demoDot" style="width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block;transition:background 0.2s"></span>
+      <span id="demoLabel">DEMO OFF</span>
+    </button>
+    <button id="settingsBtn" onclick="openSettings()" title="API Key Settings" style="background:none;border:1.5px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;transition:all 0.2s;position:relative;flex-shrink:0" onmouseover="this.style.borderColor='var(--border-hi)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙<span id="keyDot" style="display:none;position:absolute;top:2px;right:2px;width:7px;height:7px;border-radius:50%;background:#C45050;border:1.5px solid var(--bg)"></span></button>
+  </div>
+</nav>
+
+<!-- Settings Modal -->
+<div id="settingsOverlay" onclick="if(event.target===this)closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(61,46,34,0.35);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:32px 28px;width:min(420px,90vw);box-shadow:0 8px 32px rgba(61,46,34,0.12)">
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:6px">API Key</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">Required for the AI clinical summary. Stored only in this browser — sent directly to Anthropic. Get yours at <span style="color:var(--accent)">console.anthropic.com</span></div>
+    <input id="keyInput" type="password" placeholder="sk-ant-api03-…" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;margin-bottom:14px" onfocus="this.style.borderColor='var(--border-hi)'" onblur="this.style.borderColor='var(--border)'"/>
+    <div style="display:flex;gap:10px">
+      <button onclick="applyApiKey()" style="flex:1;background:var(--accent);color:white;border:none;border-radius:10px;padding:12px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:13px;cursor:pointer;letter-spacing:0.04em">Save key</button>
+      <button onclick="closeSettings()" style="padding:12px 18px;background:none;border:1.5px solid var(--border);border-radius:10px;font-family:'Quicksand',sans-serif;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)">Cancel</button>
+    </div>
+    <div id="keyMsg" style="margin-top:12px;font-size:12px;color:var(--green);text-align:center;display:none"></div>
+  </div>
+</div>
+
+<!-- ── UPLOAD ZONE ── -->
+<div id="uploadZone">
+  <div class="upload-logo">Mirumi</div>
+  <div class="upload-sub">Therapist Report Viewer</div>
+
+  <!-- Received-report card (shown when student sends via link) -->
+  <div id="receivedCard" style="display:none;margin-bottom:28px;background:rgba(168,181,162,0.13);border:1.5px solid rgba(168,181,162,0.45);border-radius:20px;padding:28px 32px;text-align:center;max-width:440px;width:100%;box-sizing:border-box;animation:fadeUp 0.4s ease">
+    <div style="font-size:36px;margin-bottom:12px">📋</div>
+    <div id="receivedName" style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:6px">Report received</div>
+    <div id="receivedMeta" style="font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-bottom:22px"></div>
+    <button onclick="openReceivedReport()" style="padding:12px 32px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(200,132,90,0.35);transition:background 0.2s" onmouseover="this.style.background='#b8733d'" onmouseout="this.style.background='var(--accent)'">Open Report →</button>
+  </div>
+
+  <div class="drop-area" id="dropArea">
+    <span class="drop-icon">📋</span>
+    <div class="drop-title">Drop client report here</div>
+    <div class="drop-hint">Drag &amp; drop the JSON file exported from the client's Mirumi app<br>or click to browse</div>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+
+  <div class="upload-or">or</div>
+  <button class="demo-btn" onclick="loadDemo()">Load 7-Day Demo →</button>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard">
+<div class="dash-inner">
+
+  <!-- Client info strip -->
+  <div class="client-strip">
+    <div class="client-meta" id="clientMeta"></div>
+    <button class="reset-btn" onclick="resetDashboard()">← Load New File</button>
+  </div>
+
+  <!-- Crisis Flag -->
+  <div class="crisis-panel" id="crisisPanel">
+    <div class="crisis-indicator" id="crisisIcon"></div>
+    <div class="crisis-body">
+      <div class="crisis-level" id="crisisLevel"></div>
+      <div class="crisis-title" id="crisisTitle"></div>
+      <div class="crisis-reasons" id="crisisReasons"></div>
+    </div>
+  </div>
+
+  <!-- Grid: Mood Timeline + Overview -->
+  <div class="dash-grid">
+    <div class="dash-card">
+      <div class="card-label">7-Day Mood Timeline</div>
+      <div class="timeline-track" id="timelineTrack"></div>
+      <!-- Mood flower chart -->
+      <div class="flower-section" id="moodFlowerSection">
+        <div class="flower-label">Emotional Journey</div>
+        <div id="moodFlowerSvg"></div>
+        <div class="flower-legend" id="moodFlowerLegend"></div>
+      </div>
+    </div>
+    <div class="dash-card">
+      <div class="card-label">Client Overview</div>
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+  </div>
+
+  <!-- AI Weekly Summary -->
+  <div class="ai-summary-card">
+    <div class="ai-summary-top">
+      <div>
+        <div class="ai-tag">AI Weekly Summary</div>
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="generateSummary()">Generate Summary →</button>
+    </div>
+    <div class="ai-summary-body" id="aiSummaryBody">
+      <span class="ai-placeholder">Click "Generate Summary" to synthesize this week's entries with AI — clinical overview, mood arc, and relationship themes.</span>
+    </div>
+  </div>
+
+  <!-- Relationship Health -->
+  <div class="rel-card" id="relCard" style="display:none">
+    <div class="card-label">Relationship Health</div>
+    <div id="relContent"></div>
+  </div>
+
+  <!-- Journal Entries -->
+  <div class="journal-card">
+    <div class="card-label">Journal Entries</div>
+    <div id="journalContent"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── Mood data ──
+const MOOD_COLORS={
+  happy:'#E8D5A3',touched:'#A8B5A2',calm:'#B0ADB5',excited:'#D4B5B5',
+  sad:'#9BAFC4',hurt:'#8E9BAE',anxious:'#B5A8C8',angry:'#C4A09A',irritated:'#C8B09A'
+};
+const MOOD_EMOJIS={happy:'😊',touched:'🥰',calm:'😌',excited:'🌸',sad:'😔',hurt:'😢',anxious:'😟',angry:'😠',irritated:'😤'};
+const MOOD_NAMES={happy:'Happy',touched:'Touched',calm:'Calm',excited:'Excited',sad:'Sad',hurt:'Hurt',anxious:'Anxious',angry:'Angry',irritated:'Irritated'};
+
+// Crisis language signals — aligned with Columbia C-SSRS passive ideation indicators
+const CRISIS_SIGNALS=[
+  // Hopelessness & meaninglessness
+  'no point',"what's the point",'nothing matters','pointless','meaningless',
+  'no future','no hope','hopeless',"it's over",
+  // Withdrawal & disappearing
+  'want to disappear','disappear','go away forever','nobody would notice',
+  'better off without me','would be better off',
+  // Giving up
+  'give up','giving up',"can't go on","can't do this anymore",
+  "don't care anymore",'stopped caring',"what's the use",
+  // Exhaustion crossing into despair
+  'so tired of everything','tired of living','exhausted with life',
+  // Worthlessness
+  'worthless','useless',"i'm nothing","i'm a burden",'burden to everyone',
+  // Passive ideation
+  "don't want to be here","rather not be here","wish i wasn't here",
+  'wish i could sleep forever','not wake up'
+];
+
+let currentData = null;
+
+// ── Drag & Drop ──
+const dropArea = document.getElementById('dropArea');
+const fileInput = document.getElementById('fileInput');
+
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+dropArea.addEventListener('drop', e => {
+  e.preventDefault();
+  dropArea.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) readFile(file);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) readFile(e.target.files[0]); });
+
+function getApiKey(){return localStorage.getItem('mirumi_api_key')||'';}
+function saveApiKey(k){localStorage.setItem('mirumi_api_key',k.trim());}
+function openSettings(){
+  document.getElementById('keyInput').value=getApiKey();
+  document.getElementById('keyMsg').style.display='none';
+  const o=document.getElementById('settingsOverlay');
+  o.style.display='flex';
+}
+function closeSettings(){document.getElementById('settingsOverlay').style.display='none';}
+function applyApiKey(){
+  const k=document.getElementById('keyInput').value.trim();
+  if(!k){document.getElementById('keyMsg').style.display='block';document.getElementById('keyMsg').style.color='var(--crisis-red)';document.getElementById('keyMsg').textContent='Please paste your API key first.';return;}
+  saveApiKey(k);
+  updateKeyDot();
+  document.getElementById('keyMsg').style.display='block';
+  document.getElementById('keyMsg').style.color='var(--crisis-green)';
+  document.getElementById('keyMsg').textContent='✓ Key saved.';
+  setTimeout(closeSettings,1000);
+}
+function updateKeyDot(){
+  document.getElementById('keyDot').style.display=getApiKey()?'none':'block';
+}
+
+// ── Demo Mode ──
+function isDemoMode(){return localStorage.getItem('mirumi_demo')==='1';}
+function toggleDemoMode(){
+  const on=!isDemoMode();
+  localStorage.setItem('mirumi_demo',on?'1':'0');
+  updateDemoBtn();
+}
+function updateDemoBtn(){
+  const on=isDemoMode();
+  const btn=document.getElementById('demoBtn');
+  const dot=document.getElementById('demoDot');
+  const lbl=document.getElementById('demoLabel');
+  if(!btn)return;
+  btn.style.borderColor=on?'var(--crisis-green)':'var(--border)';
+  btn.style.color=on?'var(--crisis-green)':'var(--muted)';
+  dot.style.background=on?'var(--crisis-green)':'var(--muted)';
+  lbl.textContent=on?'DEMO ON':'DEMO OFF';
+}
+
+const DEMO_CLINICAL_SUMMARY = `This client's week presents a clinically concerning pattern of progressive emotional deterioration across six consecutive entries. The arc moves from a quiet, flat affect on Day 1 through escalating interpersonal anxiety and social withdrawal, arriving by week's end at resignation and anger — with multiple passive-ideation language markers present across the final two entries. The central relational stressor is the client's primary partnership, which shows a precipitous self-reported health decline from 48 to 18, driven by repeated stonewalling, emotional invalidation, and the partner characterising the client's distress as "starting drama." A secondary dismissal from a trusted friend has contributed to the client beginning to generalise a felt sense of being a burden — a pattern corroborated across three separate entries. Language including "I'm a burden to everyone," "can't go on pretending," and "just want to stop feeling like this" warrants a brief safety check-in before proceeding with the standard session agenda.`;
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      renderDashboard(data);
+    } catch {
+      alert('Could not parse this file. Please make sure it is a valid Mirumi JSON export.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Demo Data (7-day scenario) ──
+function loadDemo() {
+  // Fixed dates: Apr 25–30, 2026 (6 pre-demo entries). Live Day 7 added on demo day May 1.
+  const DAY = ['2026-04-25','2026-04-26','2026-04-27','2026-04-28','2026-04-29','2026-04-30'];
+  const day = (offset) => DAY[offset] || DAY[DAY.length-1];
+
+  const demoData = {
+    exported_at: today.toISOString().slice(0, 10),
+    user_label: 'Anonymous',
+    journal_entries: [
+      {
+        // Day 1 — Calm: slightly tired, end of a long week
+        date: day(0),
+        text: 'Today was okay, just a bit tired. Finished most of what I needed to at work. Came home and made tea. Felt a little empty but nothing specific — just quiet. I think I needed the quiet.',
+        mood_key: 'calm',
+        mood_name: 'Calm',
+        mood_analysis: 'A generally neutral day with mild fatigue and emotional flatness. No acute distress. The client is self-aware about needing rest.',
+        praise_title: 'You honored your need for stillness',
+        reframe: 'Quiet days aren\'t empty days — they\'re how we refill.',
+        growth_question: 'What would make tomorrow feel more intentional?'
+      },
+      {
+        // Day 2 — Anxious: fight with partner, cancelled plans, stonewalling
+        date: day(1),
+        text: 'We had another argument. We were supposed to go out tonight and he just suddenly said he didn\'t want to anymore. No reason. When I asked why, he just went silent. I pushed a little and he acted like I was being unreasonable. I don\'t understand what I did wrong. I keep replaying it. I can\'t go on pretending everything is fine when it\'s not.',
+        mood_key: 'anxious',
+        mood_name: 'Anxious',
+        mood_analysis: 'High interpersonal anxiety from conflict avoidance and stonewalling. Client shows rumination and hypervigilance about partner\'s reactions.',
+        praise_title: 'You tried to connect — that takes courage',
+        reframe: 'Needing an explanation is reasonable, not unreasonable.',
+        growth_question: 'What would you need from him to feel safe bringing this up again?'
+      },
+      {
+        // Day 3 — Sad: took day off, withdrawal, anhedonia
+        date: day(2),
+        text: 'Called in sick. Stayed in bed until 2pm. Didn\'t eat much. My brain kept looping but I couldn\'t grab onto any thought clearly. It felt like I was just existing. My friend texted asking if I was okay and I just said "yeah just tired." I didn\'t have the energy to explain. Everything feels like too much effort right now.',
+        mood_key: 'sad',
+        mood_name: 'Sad',
+        mood_analysis: 'Social withdrawal, psychomotor slowing, low appetite, emotional numbing. Masking distress from support network. Consistent with low-grade depressive episode.',
+        praise_title: 'You gave yourself permission to stop',
+        reframe: 'Resting when you\'re overwhelmed isn\'t giving up — it\'s recognizing your limits.',
+        growth_question: 'What is one small thing your body is asking for right now?'
+      },
+      {
+        // Day 4 — Hurt: rumination on "you think too much", self-blame
+        date: day(3),
+        text: 'His words are still stuck in my head. He said "you think too much" and I keep turning it over and over. I know I shouldn\'t let it get to me but it does. Maybe I am too sensitive. Maybe I make things harder than they need to be. I can\'t tell anymore if my feelings are valid or if I\'m just being difficult. I just feel so worn down by all of it.',
+        mood_key: 'hurt',
+        mood_name: 'Hurt',
+        mood_analysis: 'Deep self-doubt and internalized blame following dismissive communication. Client questioning the validity of their own emotional experience — a significant pattern.',
+        praise_title: 'You stayed with your feelings instead of running',
+        reframe: 'Questioning yourself shows self-awareness. It doesn\'t mean you\'re wrong.',
+        growth_question: 'What would you tell a close friend who was feeling this way?'
+      },
+      {
+        // Day 5 — Anxious: poor sleep, dismissed by friend too
+        date: day(4),
+        text: 'Barely slept. Woke up at 4am and couldn\'t get back to sleep. The anxiety just sits in my chest all morning. I mentioned it to my friend over lunch and she said I was "overthinking as usual." I didn\'t say anything after that. Maybe everyone around me sees it the same way. I just feel like such a burden to the people who care about me.',
+        mood_key: 'anxious',
+        mood_name: 'Anxious',
+        mood_analysis: 'Sleep disturbance, anticipatory dread, and now feeling dismissed by a second attachment figure. Client beginning to generalize the feeling of being a burden — clinically significant phrase.',
+        praise_title: 'You reached out even when it was hard',
+        reframe: 'One person\'s impatience doesn\'t define how others experience you.',
+        growth_question: 'Who in your life has made you feel truly heard?'
+      },
+      {
+        // Day 6 — Angry: communication breakdown, resignation, shutdown
+        date: day(5),
+        text: 'I tried one more time. I told him I was struggling and needed him to listen. He said I was "starting drama." I just stopped. There\'s no point trying to explain anymore. I\'m so tired of being told my feelings are too much. I\'ve stopped caring whether things get better. I just want to stop feeling like this.',
+        mood_key: 'angry',
+        mood_name: 'Angry',
+        mood_analysis: 'Communication shutdown after repeated invalidation. Anger converting to resignation and disengagement. Phrase "stopped caring" and "no point" are clinically notable escalation markers.',
+        praise_title: 'You kept showing up even when it wasn\'t received',
+        reframe: 'Withdrawal can be a boundary. But what you need isn\'t wrong — it just hasn\'t been met.',
+        growth_question: 'Is there someone outside this relationship you feel safe talking to?'
+      },
+    ],
+    relationships: {
+      'Partner': [
+        {
+          date: day(1),
+          situation: 'Cancelled plans without explanation, then went silent when I asked why. Acted like I was unreasonable for asking.',
+          trend_score: 48,
+          red_flags: 'Stonewalling, dismissiveness, avoidance of accountability',
+          emotion_read: 'Client feels confused, unheard, walking on eggshells around partner\'s reactions',
+          summary_title: 'Cancelled plans — stonewalling follows'
+        },
+        {
+          date: day(3),
+          situation: 'Said "you think too much" when I tried to talk about my feelings. Made me feel like my emotions are a problem.',
+          trend_score: 32,
+          red_flags: 'Emotional invalidation, possible gaslighting — client beginning to doubt own perception',
+          emotion_read: 'Deep self-doubt triggered; client internalizing blame and questioning their own emotional validity',
+          summary_title: '"You think too much" — invalidation pattern'
+        },
+        {
+          date: day(5),
+          situation: 'Tried to share that I was struggling. He called it "starting drama" and shut down. I gave up trying to talk.',
+          trend_score: 18,
+          red_flags: 'Repeated dismissal of distress, escalating contempt pattern, client abandoning communication attempts',
+          emotion_read: 'Complete resignation and emotional shutdown. Client no longer believes the relationship is safe for vulnerability.',
+          summary_title: 'Client goes silent — giving up on connection'
+        }
+      ],
+      'Friend (Mia)': [
+        {
+          date: day(4),
+          situation: 'Mentioned I was struggling and she said I was "overthinking as usual." I didn\'t say anything after that.',
+          trend_score: 55,
+          red_flags: 'Dismissive response to disclosure of distress — may reflect fatigue in friendship or client\'s presentation',
+          emotion_read: 'Client felt unseen and began generalizing feeling of being a burden to all relationships',
+          summary_title: 'Support attempt met with dismissal'
+        }
+      ]
+    }
+  };
+
+  renderDashboard(demoData);
+}
+
+// ── Mood Flower Chart ──
+const FLOWER_MOODS = ['happy','touched','calm','excited','sad','hurt','anxious','angry','irritated'];
+const FLOWER_COLORS = {
+  happy:'#E8D5A3',touched:'#A8B5A2',calm:'#B0ADB5',excited:'#D4B5B5',
+  sad:'#9BAFC4',hurt:'#8E9BAE',anxious:'#B5A8C8',angry:'#C4A09A',irritated:'#C8B09A'
+};
+const FLOWER_NAMES = {
+  happy:'Happy',touched:'Touched',calm:'Calm',excited:'Excited',
+  sad:'Sad',hurt:'Hurt',anxious:'Anxious',angry:'Angry',irritated:'Irritated'
+};
+
+function renderMoodFlower(entries) {
+  const svgEl = document.getElementById('moodFlowerSvg');
+  const legEl = document.getElementById('moodFlowerLegend');
+  if (!svgEl || !legEl) return;
+
+  const sorted = [...(entries||[])].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const n = sorted.length;
+  if (!n) {
+    svgEl.innerHTML = '';
+    legEl.innerHTML = '<span style="font-size:10px;color:var(--muted)">No mood data</span>';
+    return;
+  }
+
+  const VALENCE = {happy:92,touched:80,excited:88,calm:70,tired:38,sad:22,hurt:18,anxious:28,angry:12,irritated:20};
+
+  const PL=38,PR=12,PT=14,PB=44;
+  const CW = Math.max(n*66, 280), CH = 110;
+  const SW = PL+CW+PR, SH = PT+CH+PB;
+
+  const pts = sorted.map((e,i) => {
+    const mk = e.mood_key || 'calm';
+    const v = VALENCE[mk] ?? 50;
+    const x = n===1 ? PL+CW/2 : PL+(i/(n-1))*CW;
+    const y = PT+CH-(v/100)*CH;
+    return {x,y,mk,col:FLOWER_COLORS[mk]||'#B0ADB5',lbl:FLOWER_NAMES[mk]||mk,date:e.date};
+  });
+
+  function curvePath(p) {
+    if (p.length===1) return `M${p[0].x.toFixed(1)},${p[0].y.toFixed(1)}`;
+    let d = `M${p[0].x.toFixed(1)},${p[0].y.toFixed(1)}`;
+    for (let i=0;i<p.length-1;i++) {
+      const dx=(p[i+1].x-p[i].x)*0.42;
+      d+=` C${(p[i].x+dx).toFixed(1)},${p[i].y.toFixed(1)} ${(p[i+1].x-dx).toFixed(1)},${p[i+1].y.toFixed(1)} ${p[i+1].x.toFixed(1)},${p[i+1].y.toFixed(1)}`;
+    }
+    return d;
+  }
+  const linePath = curvePath(pts);
+  const areaPath = `${linePath} L${pts[n-1].x.toFixed(1)},${(PT+CH).toFixed(1)} L${pts[0].x.toFixed(1)},${(PT+CH).toFixed(1)} Z`;
+
+  const guides = [{pct:75,lbl:'better'},{pct:50,lbl:''},{pct:25,lbl:'harder'}].map(({pct,lbl}) => {
+    const gy = (PT+CH-(pct/100)*CH).toFixed(1);
+    return `<line x1="${PL}" y1="${gy}" x2="${PL+CW}" y2="${gy}" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,4"/>
+      ${lbl?`<text x="${PL-5}" y="${(+gy+3.5).toFixed(1)}" text-anchor="end" font-size="7.5" fill="var(--muted)" font-family="Quicksand,sans-serif">${lbl}</text>`:''}`;
+  }).join('');
+
+  const dots = pts.map(p => {
+    const _pd=p.date&&p.date.length===10?new Date(p.date+'T12:00:00'):new Date(p.date);const ds=_pd.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5.5" fill="${p.col}" stroke="#fdf8f3" stroke-width="2"/>
+      <text x="${p.x.toFixed(1)}" y="${(PT+CH+13).toFixed(1)}" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="Quicksand,sans-serif">${ds}</text>
+      <text x="${p.x.toFixed(1)}" y="${(PT+CH+24).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="${p.col}" font-family="Quicksand,sans-serif" font-weight="700">${p.lbl}</text>`;
+  }).join('');
+
+  const counts = {};
+  sorted.forEach(e => { if(e.mood_key) counts[e.mood_key]=(counts[e.mood_key]||0)+1; });
+  legEl.innerHTML = Object.entries(counts).map(([mk,c]) =>
+    `<div class="fl-item"><div class="fl-dot" style="background:${FLOWER_COLORS[mk]||'#ccc'}"></div>${FLOWER_NAMES[mk]||mk} ×${c}</div>`
+  ).join('') || '<span style="font-size:10px;color:var(--muted)">No mood data</span>';
+
+  svgEl.innerHTML = `<div style="overflow-x:auto;width:100%;padding-bottom:2px">
+    <svg width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg" style="display:block;min-width:${SW}px">
+      <defs>
+        <linearGradient id="therapistAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C4788A" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#C4788A" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      ${guides}
+      <path d="${areaPath}" fill="url(#therapistAreaGrad)"/>
+      <path d="${linePath}" fill="none" stroke="#C4788A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+    </svg>
+  </div>`;
+}
+
+// ── Dashboard Renderer ──
+function renderDashboard(data) {
+  currentData = data;
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('fileInput').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+
+  const entries = (data.journal_entries || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+  const relations = data.relationships || {};
+
+  // Client meta strip
+  const dateRange = entries.length > 0
+    ? `${fmtDate(entries[entries.length - 1].date)} → ${fmtDate(entries[0].date)}`
+    : 'No entries';
+  document.getElementById('clientMeta').textContent =
+    `Client: ${data.user_label || 'Anonymous'} · Exported ${fmtDate(data.exported_at)} · ${entries.length} entries`;
+
+  // Crisis detection
+  renderCrisis(entries, relations);
+
+  // Mood timeline (last 7 days)
+  renderTimeline(entries);
+
+  // Mood flower chart
+  renderMoodFlower(entries);
+
+  // Stats
+  renderStats(entries, relations);
+
+  // Relationships
+  renderRelationships(relations);
+
+  // Journal entries
+  renderJournal(entries);
+
+  // Reset AI summary
+  document.getElementById('aiSummaryBody').innerHTML = '<span class="ai-placeholder">Click "Generate Summary" to synthesize this week\'s entries with AI — clinical overview, mood arc, and relationship themes.</span>';
+  document.getElementById('genBtn').disabled = false;
+}
+
+// ── Crisis Detection ──
+function detectCrisis(entries, relations) {
+  let level = 'green';
+  let reasons = [];
+
+  const recent = entries.slice(0, 7);
+  const badMoods = ['sad', 'hurt', 'anxious', 'angry'];
+
+  // 1. Consecutive bad mood days
+  let consecutive = 0;
+  let maxConsecutive = 0;
+  for (const e of recent) {
+    if (badMoods.includes(e.mood_key)) {
+      consecutive++;
+      maxConsecutive = Math.max(maxConsecutive, consecutive);
+    } else {
+      consecutive = 0;
+    }
+  }
+  if (maxConsecutive >= 5) {
+    level = 'red';
+    reasons.push(`${maxConsecutive} consecutive low-mood days`);
+  } else if (maxConsecutive >= 3) {
+    if (level === 'green') level = 'amber';
+    reasons.push(`${maxConsecutive} consecutive low-mood days`);
+  }
+
+  // 2. Language signals
+  let signalCount = 0;
+  let signalEntries = [];
+  for (const e of recent) {
+    const txt = (e.text || '').toLowerCase();
+    const hit = CRISIS_SIGNALS.find(s => txt.includes(s.toLowerCase()));
+    if (hit) {
+      signalCount++;
+      signalEntries.push(e);
+    }
+  }
+  if (signalCount >= 2) {
+    level = 'red';
+    reasons.push(`${signalCount} language signals detected`);
+  } else if (signalCount === 1) {
+    if (level === 'green') level = 'amber';
+    reasons.push('1 language signal detected');
+  }
+
+  // 3. Relationship score below 30
+  let relFlags = [];
+  for (const [name, relEntries] of Object.entries(relations)) {
+    if (!relEntries || !relEntries.length) continue;
+    const latest = relEntries[0];
+    if (latest.trend_score <= 30) {
+      level = 'red';
+      relFlags.push(`${name}: score ${latest.trend_score}/100`);
+    } else if (latest.trend_score <= 40) {
+      if (level === 'green') level = 'amber';
+      relFlags.push(`${name}: score ${latest.trend_score}/100`);
+    }
+    // Drop > 20 points
+    if (relEntries.length >= 2) {
+      const prev = relEntries[relEntries.length - 1].trend_score;
+      const curr = relEntries[0].trend_score;
+      if (prev - curr >= 20) {
+        if (level === 'green') level = 'amber';
+        relFlags.push(`${name}: dropped ${prev - curr} pts this week`);
+      }
+    }
+  }
+  if (relFlags.length) reasons.push(...relFlags.map(f => `Relationship: ${f}`));
+
+  // Defaults
+  if (reasons.length === 0) reasons.push('No immediate concerns detected');
+
+  return { level, reasons, signalEntries };
+}
+
+function renderCrisis(entries, relations) {
+  const { level, reasons, signalEntries } = detectCrisis(entries, relations);
+  const panel = document.getElementById('crisisPanel');
+  panel.className = `crisis-panel ${level}`;
+
+  const icons = { green: '✓', amber: '!', red: '!!' };
+  const levels = { green: 'Low Risk', amber: 'Moderate Risk', red: 'Elevated Risk — Review Recommended' };
+  const titles = {
+    green: 'No immediate crisis indicators',
+    amber: 'Some concerns — monitor closely',
+    red: 'Crisis signals present — prioritize this session'
+  };
+
+  document.getElementById('crisisIcon').textContent = icons[level];
+  document.getElementById('crisisLevel').textContent = levels[level];
+  document.getElementById('crisisTitle').textContent = titles[level];
+  document.getElementById('crisisReasons').innerHTML = reasons.map(r => `<span>${r}</span>`).join('');
+}
+
+// ── Mood Timeline ──
+function renderTimeline(entries) {
+  const track = document.getElementById('timelineTrack');
+  const today = new Date();
+
+  const toLocalDate = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  // Build a map of date → entry
+  // Plain date strings ('2026-04-25') get T12:00:00 to avoid UTC midnight shifting them to the day before
+  const parseDate = (s) => s && s.length === 10 ? new Date(s + 'T12:00:00') : new Date(s);
+  const entryByDate = {};
+  for (const e of entries) {
+    const key = toLocalDate(parseDate(e.date));
+    if (!entryByDate[key] || parseDate(e.date) > parseDate(entryByDate[key].date)) {
+      entryByDate[key] = e;
+    }
+  }
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(toLocalDate(d));
+  }
+
+  track.innerHTML = days.map(dateStr => {
+    const e = entryByDate[dateStr];
+    const d = new Date(dateStr + 'T00:00:00');
+    const label = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayNum = d.toLocaleDateString('en-US', { day: 'numeric' });
+
+    if (!e) {
+      return `<div class="tl-day">
+        <div class="tl-dot tl-empty" title="No entry">—</div>
+        <div class="tl-dot-date">${label}<br>${dayNum}</div>
+      </div>`;
+    }
+
+    const color = MOOD_COLORS[e.mood_key] || '#B0ADB5';
+    const emoji = MOOD_EMOJIS[e.mood_key] || '·';
+    const name = MOOD_NAMES[e.mood_key] || '';
+
+    // Check crisis signal on this day
+    const txt = (e.text || '').toLowerCase();
+    const hasSignal = CRISIS_SIGNALS.some(s => txt.includes(s.toLowerCase()));
+    const signalDot = hasSignal ? '⚠' : '';
+
+    return `<div class="tl-day">
+      <div class="tl-dot" style="background:${color}30;border-color:${color}80" title="${name}: ${e.text ? e.text.slice(0, 60) + '…' : ''}">
+        ${emoji}${signalDot ? `<span style="position:absolute;top:-4px;right:-4px;font-size:10px">${signalDot}</span>` : ''}
+      </div>
+      <div class="tl-dot-date">${label}<br>${dayNum}</div>
+      <div class="tl-dot-name">${name}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Stats ──
+function renderStats(entries, relations) {
+  const badMoods = ['sad', 'hurt', 'anxious', 'angry'];
+  const lowCount = entries.slice(0, 7).filter(e => badMoods.includes(e.mood_key)).length;
+  const relCount = Object.keys(relations).length;
+  const latestScore = relCount > 0
+    ? Math.round(Object.values(relations).flat().sort((a, b) => new Date(b.date) - new Date(a.date))[0]?.trend_score || 0)
+    : null;
+
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-item"><div class="stat-num">${entries.length}</div><div class="stat-lbl">Journal Entries</div></div>
+    <div class="stat-item"><div class="stat-num">${lowCount}/7</div><div class="stat-lbl">Low-Mood Days</div></div>
+    <div class="stat-item"><div class="stat-num">${relCount}</div><div class="stat-lbl">Relationships</div></div>
+    ${latestScore !== null
+      ? `<div class="stat-item"><div class="stat-num" style="color:${latestScore < 40 ? 'var(--crisis-red)' : latestScore < 60 ? 'var(--crisis-amber)' : 'var(--crisis-green)'}">${latestScore}</div><div class="stat-lbl">Latest Rel. Score</div></div>`
+      : `<div class="stat-item"><div class="stat-num" style="color:var(--muted)">—</div><div class="stat-lbl">Rel. Score</div></div>`}
+  `;
+}
+
+// ── Relationships ──
+function renderRelationships(relations) {
+  const card = document.getElementById('relCard');
+  const names = Object.keys(relations);
+  if (!names.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  document.getElementById('relContent').innerHTML = names.map(name => {
+    const relEntries = (relations[name] || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const latest = relEntries[0];
+    const score = latest.trend_score ?? 50;
+
+    // Compute drop
+    let dropAmt = 0;
+    let dropAlert = null;
+    if (relEntries.length >= 2) {
+      const oldest = relEntries[relEntries.length - 1].trend_score ?? 50;
+      dropAmt = oldest - score;
+    }
+
+    // Color by score
+    const scoreColor = score <= 30 ? 'var(--crisis-red)' : score <= 50 ? 'var(--crisis-amber)' : 'var(--crisis-green)';
+    const badgeStyle = score <= 30
+      ? 'color:var(--crisis-red);background:var(--crisis-red-soft);border:1px solid rgba(196,80,80,0.25)'
+      : score <= 50
+      ? 'color:var(--crisis-amber);background:var(--crisis-amber-soft);border:1px solid rgba(196,136,48,0.25)'
+      : 'color:var(--crisis-green);background:var(--crisis-green-soft);border:1px solid rgba(90,154,106,0.25)';
+
+    let alerts = '';
+    if (score <= 30) alerts += '<div class="rel-alert red">⚠ Below crisis threshold (30/100)</div>';
+    if (dropAmt >= 20) alerts += `<div class="rel-alert amber">↓ Dropped ${dropAmt} pts this period</div>`;
+    if (latest.red_flags) alerts += `<div class="rel-meta">🚩 ${latest.red_flags}</div>`;
+
+    return `<div class="rel-person">
+      <div class="rel-top">
+        <div class="rel-name">${name}</div>
+        <div class="rel-score-badge" style="${badgeStyle}">${score}/100</div>
+      </div>
+      <div class="rel-bar-track"><div class="rel-bar-fill" style="width:${score}%"></div></div>
+      <div style="font-family:'Quicksand',sans-serif;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:6px">${relEntries.length} session${relEntries.length !== 1 ? 's' : ''} logged · Latest: ${fmtDate(latest.date)}</div>
+      ${alerts}
+    </div>`;
+  }).join('');
+}
+
+// ── Journal Entries ──
+function renderJournal(entries) {
+  if (!entries.length) {
+    document.getElementById('journalContent').innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;font-family:Quicksand,sans-serif">No journal entries found.</div>';
+    return;
+  }
+
+  document.getElementById('journalContent').innerHTML = entries.map((e, i) => {
+    const color = MOOD_COLORS[e.mood_key] || '#B0ADB5';
+    const emoji = MOOD_EMOJIS[e.mood_key] || '·';
+    const name = MOOD_NAMES[e.mood_key] || '';
+
+    // Crisis signal badge
+    const txt = (e.text || '').toLowerCase();
+    const hitSignal = CRISIS_SIGNALS.find(s => txt.includes(s.toLowerCase()));
+    const signalBadge = hitSignal
+      ? `<span class="crisis-signal-badge">⚠ Language signal</span>` : '';
+
+    return `<div class="j-entry">
+      <div class="j-entry-header" onclick="toggleEntry(${i})">
+        <div class="j-mood-pill" style="background:${color}25;border:1.5px solid ${color}70;color:#5a4030">
+          ${emoji} ${name}
+        </div>
+        <div class="j-entry-title">${e.praise_title || e.text?.slice(0, 50) || '—'}${signalBadge}</div>
+        <div class="j-entry-date">${fmtDate(e.date)}</div>
+        <div class="j-toggle" id="toggle-${i}">▼</div>
+      </div>
+      <div class="j-entry-body" id="body-${i}">
+        <div class="j-text-label">Client's entry</div>
+        <div class="j-text">${escHtml(e.text || '—')}</div>
+        ${e.mood_analysis || e.reframe ? `<div class="j-analysis-row">
+          ${e.mood_analysis ? `<div class="j-analysis-item"><strong>Mood analysis</strong>${escHtml(e.mood_analysis)}</div>` : ''}
+          ${e.reframe ? `<div class="j-analysis-item"><strong>Reframe</strong>${escHtml(e.reframe)}</div>` : ''}
+          ${e.growth_question ? `<div class="j-analysis-item"><strong>Growth prompt</strong>${escHtml(e.growth_question)}</div>` : ''}
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleEntry(i) {
+  const body = document.getElementById(`body-${i}`);
+  const tog = document.getElementById(`toggle-${i}`);
+  const open = body.classList.toggle('open');
+  tog.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// ── AI Weekly Summary ──
+async function generateSummary() {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    alert('No API key found — click ⚙ in the top right to add yours.');
+    return;
+  }
+  if (!currentData) return;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  const body = document.getElementById('aiSummaryBody');
+  body.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div> Generating clinical summary…</div>';
+
+  const entries = (currentData.journal_entries || []).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const relations = currentData.relations || currentData.relationships || {};
+
+  const journalSummary = entries.map((e, i) =>
+    `Day ${i + 1} (${e.date}) — Mood: ${e.mood_key} / ${e.mood_name || ''}\nEntry: ${(e.text || '').slice(0, 200)}`
+  ).join('\n\n');
+
+  const relSummary = Object.entries(relations).map(([name, relEntries]) => {
+    const sorted = (relEntries || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const latest = sorted[0] || {};
+    return `${name}: latest score ${latest.trend_score ?? '?'}/100. Red flags: ${latest.red_flags || 'none'}. Summary: ${latest.summary_title || ''}`;
+  }).join('\n');
+
+  const prompt = `You are a clinical psychologist reviewing a client's weekly self-reported data from a journaling app. Write a concise 3–5 sentence clinical summary for the therapist's session preparation. Cover: (1) overall emotional arc this week, (2) key relationship dynamics or stressors, (3) any concerning patterns or language worth exploring. Use warm but professional clinical language. Do not include disclaimers or preamble — go straight to the summary.
+
+JOURNAL DATA (chronological):
+${journalSummary}
+
+${relSummary ? `RELATIONSHIP DATA:\n${relSummary}` : ''}`;
+
+  try {
+    let text;
+    if (isDemoMode()) {
+      await new Promise(r => setTimeout(r, 1600));
+      text = DEMO_CLINICAL_SUMMARY;
+    } else {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 600,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const msg = data?.error?.message || `API error ${res.status}`;
+        console.error('generateSummary API error:', res.status, data);
+        throw new Error(msg);
+      }
+      text = data.content?.map(c => c.text || '').join('') || '';
+      if (!text) throw new Error('Empty response from API');
+    }
+    body.textContent = text;
+  } catch (err) {
+    const msg = err.message.includes('401') || err.message.toLowerCase().includes('auth')
+      ? 'Invalid API key. Click ⚙ to re-enter your key.'
+      : `Error: ${err.message}`;
+    body.innerHTML = `<span class="ai-placeholder" style="color:var(--crisis-red)">${msg}</span>`;
+    btn.disabled = false;
+    console.error('generateSummary error:', err);
+  }
+}
+
+// ── Helpers ──
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function resetDashboard() {
+  currentData = null;
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('uploadZone').style.display = 'block';
+  document.getElementById('fileInput').style.display = '';
+  document.getElementById('fileInput').value = '';
+}
+let _pendingSharedData=null;
+function openReceivedReport(){
+  if(_pendingSharedData){renderDashboard(_pendingSharedData);_pendingSharedData=null;}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  updateKeyDot();
+  updateDemoBtn();
+  // Check for data passed via URL hash (from student portal "Send to Therapist" button)
+  const hash=window.location.hash;
+  if(hash.startsWith('#d=')){
+    try{
+      const encoded=hash.slice(3);
+      const json=decodeURIComponent(escape(atob(encoded)));
+      const data=JSON.parse(json);
+      // Wipe hash immediately so URL looks clean
+      history.replaceState(null,'',window.location.pathname+window.location.search);
+      // Store and show the received card
+      _pendingSharedData=data;
+      const entries=data.journal_entries||[];
+      const label=data.user_label||'Client';
+      const card=document.getElementById('receivedCard');
+      document.getElementById('receivedName').textContent=`${label}'s report received`;
+      document.getElementById('receivedMeta').textContent=
+        `${entries.length} journal entr${entries.length===1?'y':'ies'} · exported ${data.exported_at||'today'}`;
+      card.style.display='block';
+    }catch(e){
+      console.error('Could not load shared Mirumi data:',e);
+    }
+  }
+});
+</script>
+</body>
+</html>

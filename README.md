@@ -4,11 +4,13 @@
 
 Mirumi is browser-based emotion journaling tool with an optional Therapist Portal for clinical session preparation. No account required. All data stays in your browser.
 
+**🔗 Live demo:** [ycjanetchen.github.io/Mirumi_Journal](https://ycjanetchen.github.io/Mirumi_Journal/) · [Therapist Portal](https://ycjanetchen.github.io/Mirumi_Journal/therapist.html)
+
 ---
 
 ## What it does
 
-### Daily Journal (`index h.html`)
+### Daily Journal
 
 Write about your day — anything on your mind. Mirumi reads the emotional weight of your words and responds with:
 
@@ -21,7 +23,7 @@ You don't need to summarise or structure your writing. Just write.
 
 ### Relationship Archive (optional)
 
-When you mention a person by name in your journal, they can be added to your **Relationship Archive**. You can also log specific situations with someone directly — Mirumi will give you a 5-dimension analysis:
+When you mention a person by name in your journal, they can be added to your **Relationship Archive**. You can also log specific situations with someone directly — Mirumi gives you a 5-dimension analysis:
 
 1. Your emotional state in this dynamic
 2. Their likely perspective
@@ -41,9 +43,9 @@ Your past entries are saved privately in your browser. The Archive page shows:
 
 ---
 
-## Therapist Portal (`mirumi-therapist h.html`)
+## Therapist Portal
 
-When a user wants to bring their week into a therapy session, they can export a **JSON report** from the Archive page. The therapist opens `mirumi-therapist h.html` and uploads the file.
+When a user wants to bring their week into a therapy session, they can export a **JSON report** from the Archive page. The therapist opens the [Therapist Portal](https://ycjanetchen.github.io/Mirumi_Journal/therapist.html) and uploads the file.
 
 The portal shows:
 
@@ -66,29 +68,23 @@ https://drive.google.com/file/d/15MmyiqlfyKppv6oiH5KJtooiG7sue7pF/view?usp=shari
 
 ## How to use
 
-### Setup
-
-Both files are standalone HTML — no installation, no server, no dependencies.
-
-1. Download `index h.html` and `mirumi-therapist h.html`
-2. Open `index h.html` in any modern browser to start journaling
-3. Open `mirumi-therapist h.html` separately for the therapist view
+Both portals are live at the links above — no download or setup required.
 
 ### API Key (optional)
 
-Mirumi uses the Anthropic Claude API to generate journal responses and clinical summaries. To use the live AI:
+Mirumi uses the Anthropic Claude API to generate journal responses and clinical summaries. To use live AI:
 
-1. Get a API key at [console.anthropic.com](https://console.anthropic.com)
+1. Get an API key at [console.anthropic.com](https://console.anthropic.com)
 2. Click the **⚙** button in the top-right corner of either portal
-3. Paste your key — it's stored only in your browser, never sent anywhere except directly to Anthropic
+3. Paste your key — stored only in your browser, sent only to Anthropic
 
 ### Demo Mode
 
-Both portals include a built-in **Demo Mode** for presentations or testing without an API key:
+Both portals include a built-in **Demo Mode** for trying the full experience without an API key:
 
 - Click **DEMO OFF** in the nav bar → it turns green and shows **DEMO ON**
-- In the user portal: submit any journal or relationship entry — a realistic pre-written response appears instantly
-- In the therapist portal: click **"Load 7-Day Demo →"** to populate a full week of sample data, then click **"Generate Summary →"** for the AI clinical paragraph
+- In the journal: submit any entry — a realistic AI-style response appears instantly, pre-seeded with a 6-day emotional arc in the archive
+- In the therapist portal: click **"Load 7-Day Demo →"** to populate a full week of sample data, then click **"Generate Summary →"** for the clinical paragraph
 
 Demo mode is shared across both portals and persists across page refreshes.
 
@@ -96,10 +92,9 @@ Demo mode is shared across both portals and persists across page refreshes.
 
 ## Exporting to the Therapist Portal
 
-1. In `index h.html`, go to the **Archive** tab
-2. Scroll to the **Generate Therapist Report** section
-3. Click the export button — a `.json` file downloads to your computer
-4. Open `mirumi-therapist h.html` and drag the file onto the upload zone (or click to browse)
+1. In the Journal portal, go to the **Archive** tab
+2. Scroll to **Generate Therapist Report** and click export — a `.json` file downloads
+3. Open the [Therapist Portal](https://ycjanetchen.github.io/Mirumi_Journal/therapist.html) and drag the file onto the upload zone
 
 ---
 
@@ -113,7 +108,7 @@ Demo mode is shared across both portals and persists across page refreshes.
 
 ## Tech
 
-- Pure HTML / CSS / JavaScript — no frameworks, no build step
+- Pure HTML / CSS / JavaScript — no frameworks, no build step, no server
 - Anthropic Claude API (`claude-sonnet-4-6`) for AI responses
 - SVG-rendered mood charts and relationship flower visualisations
 - Crisis signal detection aligned with Columbia C-SSRS passive ideation indicators
@@ -122,6 +117,6 @@ Demo mode is shared across both portals and persists across page refreshes.
 
 ## Project
 
-Built for the **CBC Hackathon** — Neuroscience & Mental Health category.
+Built for the **CBC Hackathon 2026** — Neuroscience & Mental Health category.
 
 *Mirumi* — from 見る (miru, "to see") — because every day deserves to be seen.
