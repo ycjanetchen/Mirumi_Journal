@@ -2,7 +2,7 @@
 
 > *"The days that made you."*
 
-Mirumi is a private, browser-based emotion journaling tool with an optional Therapist Portal for clinical session preparation. No account required. All data stays in your browser.
+Mirumi is browser-based emotion journaling tool with an optional Therapist Portal for clinical session preparation. No account required. All data stays in your browser.
 
 ---
 
