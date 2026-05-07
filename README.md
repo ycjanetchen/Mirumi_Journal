@@ -119,4 +119,4 @@ Demo mode is shared across both portals and persists across page refreshes.
 
 Built for the **CBC Hackathon 2026** — Neuroscience & Mental Health category.
 
-*Mirumi* — from 見る (miru, "to see") — because every day deserves to be seen.
+*Mirumi* — drawn from the Japanese 見る (miru, "to see") — born from the belief that every day deserves to be seen, and that seeing yourself clearly is where it all begins.
